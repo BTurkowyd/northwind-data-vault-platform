@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "eu-central-1"
-}
-
 # Create a VPC
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
@@ -9,7 +5,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name = "rds-vpc"
+    Name = "dbt-data-vault-vpc"
   }
 }
 
@@ -21,7 +17,7 @@ resource "aws_subnet" "subnet1" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "subnet-1"
+    Name = "dbt-data-vault-subnet-1"
   }
 }
 
@@ -32,7 +28,7 @@ resource "aws_subnet" "subnet2" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "subnet-2"
+    Name = "dbt-data-vault-subnet-2"
   }
 }
 
@@ -59,7 +55,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public-subnet"
+    Name = "dbt-data-vault-public-subnet"
   }
 }
 
@@ -68,7 +64,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "rds-igw"
+    Name = "dbt-data-vault-igw"
   }
 }
 

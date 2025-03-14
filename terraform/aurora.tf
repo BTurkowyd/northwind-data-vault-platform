@@ -18,18 +18,19 @@ resource "aws_security_group" "aurora_sg" {
   }
 
   tags = {
-    Name = "aurora-sg"
+    Name = "dbt-data-vault-aurora-sg"
   }
 }
 
 # Aurora Serverless Cluster
 resource "aws_rds_cluster" "aurora_cluster" {
-  cluster_identifier     = "aurora-serverless-cluster"
+  cluster_identifier     = "dbt-data-vault-aurora-cluster"
   engine                 = "aurora-postgresql"
   engine_mode            = "provisioned"
   engine_version         = "16.3"
+  enable_http_endpoint = true
   database_name          = "ecommerce_db"
-  master_username        = "admin"
+  master_username        = "master"
   master_password        = random_password.aurora_password.result
   storage_encrypted      = true
   skip_final_snapshot    = true
@@ -44,19 +45,20 @@ resource "aws_rds_cluster" "aurora_cluster" {
   }
 
   tags = {
-    Name = "aurora-cluster"
+    Name = "dbt-data-vault-aurora-cluster"
   }
 }
 
 # Aurora DB Instance (Required for the Cluster)
 resource "aws_rds_cluster_instance" "aurora_instance" {
   cluster_identifier = aws_rds_cluster.aurora_cluster.id
+  identifier         = "dbt-data-vault-aurora-instance"
   instance_class     = "db.serverless"
   engine             = "aurora-postgresql"
   engine_version     = aws_rds_cluster.aurora_cluster.engine_version
 
   tags = {
-    Name = "aurora-instance"
+    Name = "dbt-data-vault-aurora-instance"
   }
 }
 
@@ -66,7 +68,7 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
   subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 
   tags = {
-    Name = "aurora-subnet-group"
+    Name = "dbt-data-vault-aurora-subnet-group"
   }
 }
 
@@ -79,7 +81,7 @@ resource "random_password" "aurora_password" {
 
 # Secret with the Aurora endpoint and credentials
 resource "aws_secretsmanager_secret" "aurora_secret" {
-  name = "aurora-secret"
+  name = "dbt-data-vault-aurora-secret"
 }
 
 resource "aws_secretsmanager_secret_version" "aurora_secret_version" {
