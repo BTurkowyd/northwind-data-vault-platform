@@ -26,7 +26,7 @@ FROM generate_series(1, 100) i;
 INSERT INTO orders (order_id, customer_id, total_amount, status, created_at)
 SELECT
     uuid_generate_v4(),
-    (SELECT customer_id FROM customers ORDER BY random() LIMIT 1), -- Random customer
+    c.customer_id, -- Randomly selected customer
     0.00 AS total_amount, -- Initialize total_amount to 0
     CASE
         WHEN random() < 0.7 THEN 'Shipped'
@@ -34,26 +34,36 @@ SELECT
         ELSE 'Pending'
     END, -- Random order status
     NOW() - (random() * interval '180 days')
-FROM generate_series(1, 10000);
+FROM generate_series(1, 10000) g
+JOIN (
+    SELECT customer_id FROM customers ORDER BY random() LIMIT 10000
+) c ON true;
 
--- Insert 100,000 Order Items
+-- Insert 100,00 Order Items
 INSERT INTO order_items (item_id, order_id, product_id, quantity, price)
 SELECT
-    uuid_generate_v4(), -- Generate unique UUID
-    op.order_id, -- Random order
-    op.product_id, -- Random product
-    op.quantity, -- Same quantity for price calculation
-    p.price * op.quantity AS price -- Use product price * quantity
+    uuid_generate_v4(), -- Generate unique UUID for each item
+    o.order_id, -- Random order_id
+    p.product_id, -- Random product_id
+    q.quantity, -- Random quantity
+    p.price * q.quantity AS price -- Compute price based on quantity
 FROM (
-    -- Generate 100,000 random order-product pairs
-    SELECT
-        (SELECT order_id FROM orders ORDER BY random() LIMIT 1) AS order_id,
-        (SELECT product_id FROM products ORDER BY random() LIMIT 1) AS product_id,
-        floor(random() * 5 + 1) AS quantity -- Quantity between 1 and 5
-    FROM generate_series(1, 100000)
-) AS op
-JOIN products p ON op.product_id = p.product_id;
-
+    -- Generate 100,000 rows and assign each row a random order_id
+    SELECT order_id, ROW_NUMBER() OVER () AS rn
+    FROM orders
+    ORDER BY random()
+    LIMIT 100000
+) o
+JOIN (
+    -- Assign each row a random product_id
+    SELECT product_id, price, ROW_NUMBER() OVER () AS rn
+    FROM products
+    ORDER BY random()
+) p ON (o.rn % 100) = (p.rn % 100) -- Ensures products are randomly distributed
+JOIN (
+    -- Generate random quantity for each row
+    SELECT generate_series(1, 100000) AS id, floor(random() * 5 + 1) AS quantity
+) q ON q.id = o.rn;
 
 -- Insert total_amount in orders table based on order_items
 UPDATE orders o
