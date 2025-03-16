@@ -9,6 +9,18 @@ resource "aws_vpc" "main" {
   }
 }
 
+resource "aws_vpc_endpoint" "s3_vpc_endpoint" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.eu-central-1.s3"
+  vpc_endpoint_type = "Gateway"
+
+  route_table_ids = [aws_route_table.private_rt.id]  # Attach to private route table
+
+  tags = {
+    Name = "s3-vpc-endpoint"
+  }
+}
+
 # Create Subnets (Aurora requires at least 2, both are private)
 resource "aws_subnet" "subnet1" {
   vpc_id                  = aws_vpc.main.id
