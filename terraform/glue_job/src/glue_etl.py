@@ -15,6 +15,7 @@ try:
     secret = client.get_secret_value(SecretId=args['AURORA_CREDS_SECRET'])
     secrets = json.loads(secret['SecretString'])
     print("Successfully retrieved Aurora credentials.")
+    print(secrets)
 
 except Exception as e:
     print(f"ERROR: Failed to retrieve credentials from Secrets Manager: {e}")
