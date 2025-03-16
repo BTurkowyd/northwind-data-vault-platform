@@ -9,4 +9,5 @@ terraform {
 
 inputs =  {
   stage = "${basename(get_terragrunt_dir())}"
+  aws_account_id = "926728314305"
 }
