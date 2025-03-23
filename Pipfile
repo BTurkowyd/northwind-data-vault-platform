@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+dbt-athena-community = "==1.9.2"
 
 [dev-packages]
 
