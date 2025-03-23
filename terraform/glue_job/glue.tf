@@ -16,7 +16,7 @@ resource "aws_glue_connection" "glue_rds_connection" {
   }
 
   physical_connection_requirements {
-    availability_zone      = "eu-central-1c"
+    availability_zone      = var.subnet.availability_zone
     security_group_id_list = [var.glue_sg.id]
     subnet_id             = var.subnet.id
   }
@@ -25,6 +25,7 @@ resource "aws_glue_connection" "glue_rds_connection" {
 resource "aws_glue_job" "glue_etl_job" {
   name     = "ecommerce-aurora-to-s3-etl-${var.stage}"
   role_arn = aws_iam_role.glue_role.arn
+  timeout = 30 # in minutes
 
   connections = [aws_glue_connection.glue_rds_connection.name]
 
