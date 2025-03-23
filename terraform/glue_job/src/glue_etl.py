@@ -2,9 +2,6 @@ import json
 import sys
 import boto3
 from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
-from awsglue.context import GlueContext
-from awsglue.job import Job
 from pyspark.sql import SparkSession
 
 print("Starting Glue ETL job...")
@@ -23,12 +20,15 @@ except Exception as e:
     print(f"ERROR: Failed to retrieve credentials from Secrets Manager: {e}")
     sys.exit(1)
 
-# Create a GlueContext
-sc = SparkContext()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-job = Job(glueContext)
-job.init("ecommerce-db-to-s3", args)
+spark = SparkSession.builder \
+    .config("spark.sql.catalog.glue_catalog", "org.apache.iceberg.spark.SparkCatalog") \
+    .config("spark.sql.catalog.glue_catalog.warehouse", f"s3://{args['DESTINATION_BUCKET']}/iceberg") \
+    .config("spark.sql.catalog.glue_catalog.catalog-impl", "org.apache.iceberg.aws.glue.GlueCatalog") \
+    .config("spark.sql.catalog.glue_catalog.io-impl", "org.apache.iceberg.aws.s3.S3FileIO") \
+    .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
+    .getOrCreate()
+
+print("Current catalog:", spark.conf.get("spark.sql.defaultCatalog"))
 
 # Construct JDBC URL
 jdbc_url = f"jdbc:postgresql://{secrets['host']}:{secrets['port']}/{secrets['dbname']}"
@@ -51,20 +51,21 @@ except Exception as e:
     print(f"ERROR: Failed to load data from Aurora: {e}")
     sys.exit(1)
 
-# Convert to Iceberg format and save to S3
-try:
-    df.write \
-        .format("iceberg") \
-        .option("write-format", "parquet") \
-        .option("write.distribution-mode", "hash") \
-        .mode("overwrite") \
-        .save(f"s3://{args['DESTINATION_BUCKET']}/iceberg/orders")
+# Register the DataFrame as a temporary SQL view
+df.createOrReplaceTempView("tmp_orders")
 
-    print("Successfully wrote data to Iceberg table in S3.")
+# Use Spark SQL to write to Iceberg table in Glue Catalog
+try:
+    spark.sql("""
+    CREATE TABLE IF NOT EXISTS glue_catalog.ecommerce_db_dev.orders
+    USING iceberg
+    TBLPROPERTIES ('format-version' = '2')
+    AS SELECT * FROM tmp_orders
+    """)
+    print("Successfully wrote data to Iceberg table in Glue Catalog.")
 
 except Exception as e:
     print(f"ERROR: Failed to write Iceberg table to S3: {e}")
     sys.exit(1)
 
-# Commit Glue job
-job.commit()
+spark.stop()

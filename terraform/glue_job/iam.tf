@@ -47,7 +47,13 @@ resource "aws_iam_policy" "glue_get_connection_policy" {
           "glue:GetConnections",
           "glue:GetDatabase",
           "glue:GetTables",
-          "glue:GetTable"
+          "glue:GetTable",
+          "glue:CreateTable",
+          "glue:UpdateTable",
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:GetDatabase",
+          "glue:CreateDatabase"
         ]
         Resource = ["arn:aws:glue:eu-central-1:${var.aws_account_id}:*"]
       }
