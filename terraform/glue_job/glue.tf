@@ -26,6 +26,8 @@ resource "aws_glue_job" "glue_etl_job" {
   name     = "ecommerce-aurora-to-s3-etl-${var.stage}"
   role_arn = aws_iam_role.glue_role.arn
 
+  connections = [aws_glue_connection.glue_rds_connection.name]
+
   command {
     script_location = "s3://${var.bucket.bucket}/scripts/glue_etl.py"
     python_version  = "3"
@@ -38,6 +40,8 @@ resource "aws_glue_job" "glue_etl_job" {
     "--enable-metrics"          = "true"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-spark-ui"         = "true"
+    "--disable-proxy-v2"        = "true"
+    "--region"                  = "eu-central-1"
     "--AURORA_CREDS_SECRET"     = var.aurora_credentials_secret_arn
     "--DESTINATION_BUCKET"      = var.bucket.id
   }

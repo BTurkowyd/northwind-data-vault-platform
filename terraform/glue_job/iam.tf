@@ -106,7 +106,9 @@ resource "aws_iam_policy" "glue_vpc_access" {
           "ec2:CreateNetworkInterface",
           "ec2:AttachNetworkInterface",
           "ec2:DeleteNetworkInterface",
-          "ec2:DescribeNetworkInterfaces"
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeVpcEndpoints",
+          "ec2:CreateTags",
         ]
         Resource = "*"
       }
@@ -117,4 +119,23 @@ resource "aws_iam_policy" "glue_vpc_access" {
 resource "aws_iam_role_policy_attachment" "glue_vpc_access_attachment" {
   role       = aws_iam_role.glue_role.name
   policy_arn = aws_iam_policy.glue_vpc_access.arn
+}
+
+resource "aws_iam_policy" "get_caller_identity_policy" {
+  name        = "GetCallerIdentityPolicy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:GetCallerIdentity"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "get_caller_identity_attachment" {
+  role       = aws_iam_role.glue_role.name
+  policy_arn = aws_iam_policy.get_caller_identity_policy.arn
 }

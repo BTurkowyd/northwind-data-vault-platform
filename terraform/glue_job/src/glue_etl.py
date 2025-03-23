@@ -7,9 +7,11 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.sql import SparkSession
 
+print("Starting Glue ETL job...")
+
 # Get the Aurora credentials from Secrets Manager
 args = getResolvedOptions(sys.argv, ['AURORA_CREDS_SECRET', 'DESTINATION_BUCKET'])
-client = boto3.client('secretsmanager')
+client = boto3.client('secretsmanager', region_name='eu-central-1')
 
 try:
     secret = client.get_secret_value(SecretId=args['AURORA_CREDS_SECRET'])
