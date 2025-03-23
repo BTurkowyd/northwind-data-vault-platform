@@ -22,6 +22,15 @@ resource "aws_security_group" "aurora_sg" {
   }
 }
 
+resource "aws_security_group_rule" "aurora_ingress_glue" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.aurora_sg.id
+  source_security_group_id = aws_security_group.glue_sg.id
+}
+
 # Aurora Serverless Cluster
 resource "aws_rds_cluster" "aurora_cluster" {
   cluster_identifier     = "dbt-data-vault-aurora-cluster"
