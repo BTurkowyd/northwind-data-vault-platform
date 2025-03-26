@@ -7,16 +7,42 @@
     merge_update_columns=['hashdiff', 'load_ts', 'quantity', 'price']
 ) }}
 
+WITH source_data AS (
+    SELECT * FROM {{ ref('stg_order_items') }}
+),
+hub_orders AS (
+    SELECT order_id, hub_order_key FROM {{ ref('hub_orders') }}
+),
+hub_products AS (
+    SELECT product_id, hub_product_key FROM {{ ref('hub_products') }}
+),
+prepared AS (
+    SELECT
+        sd.*,
+        ho.hub_order_key,
+        hp.hub_product_key,
+        {{ dbt_utils.generate_surrogate_key(['sd.quantity', 'sd.price']) }} AS hashdiff
+    FROM source_data sd
+    JOIN hub_orders ho ON sd.order_id = ho.order_id
+    JOIN hub_products hp ON sd.product_id = hp.product_id
+)
+
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['item_id', dbt_utils.generate_surrogate_key(['quantity', 'price']) ]) }} AS sat_order_item_key,
-    item_id,
+    {{ dbt_utils.generate_surrogate_key([
+        'hub_order_key',
+        'hub_product_key',
+        'hashdiff'
+    ]) }} AS sat_order_item_key,
+
+    hub_order_key,
+    hub_product_key,
     quantity,
     price,
-    {{ dbt_utils.generate_surrogate_key(['quantity', 'price']) }} AS hashdiff,
+    hashdiff,
     CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts
-FROM {{ ref('stg_order_items') }}
+
+FROM prepared
 
 {% if is_incremental() %}
-WHERE {{ dbt_utils.generate_surrogate_key(['quantity', 'price']) }}
-    NOT IN (SELECT hashdiff FROM {{ this }})
+WHERE hashdiff NOT IN (SELECT hashdiff FROM {{ this }})
 {% endif %}

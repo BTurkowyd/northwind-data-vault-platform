@@ -7,16 +7,35 @@
     merge_update_columns=['hashdiff', 'load_ts', 'total_amount', 'status']
 ) }}
 
+WITH source_data AS (
+    SELECT * FROM {{ ref('stg_orders') }}
+),
+hub_orders AS (
+    SELECT order_id, hub_order_key FROM {{ ref('hub_orders') }}
+),
+prepared AS (
+    SELECT
+        sd.*,
+        ho.hub_order_key,
+        {{ dbt_utils.generate_surrogate_key(['sd.total_amount', 'sd.status']) }} AS hashdiff
+    FROM source_data sd
+    JOIN hub_orders ho ON sd.order_id = ho.order_id
+)
+
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['order_id', dbt_utils.generate_surrogate_key(['total_amount', 'status']) ]) }} AS sat_order_key,
-    order_id,
+    {{ dbt_utils.generate_surrogate_key([
+        'hub_order_key',
+        'hashdiff'
+    ]) }} AS sat_order_key,
+
+    hub_order_key,
     total_amount,
     status,
-    {{ dbt_utils.generate_surrogate_key(['total_amount', 'status']) }} AS hashdiff,
+    hashdiff,
     CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts
-FROM {{ ref('stg_orders') }}
+
+FROM prepared
 
 {% if is_incremental() %}
-WHERE {{ dbt_utils.generate_surrogate_key(['total_amount', 'status']) }}
-    NOT IN (SELECT hashdiff FROM {{ this }})
+WHERE hashdiff NOT IN (SELECT hashdiff FROM {{ this }})
 {% endif %}
