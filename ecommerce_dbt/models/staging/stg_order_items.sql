@@ -5,5 +5,6 @@ SELECT
     order_id,
     product_id,
     quantity,
-    price
+    price,
+    '{{ var("record_source") }}.order_items' as record_source
 FROM ecommerce_db_dev.order_items

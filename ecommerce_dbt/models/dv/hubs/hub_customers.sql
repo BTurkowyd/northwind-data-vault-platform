@@ -10,7 +10,7 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(['customer_id']) }} AS hub_customer_key,
     customer_id,
     CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_date,
-    'raw_customers' AS record_source
+    record_source
 FROM {{ ref('stg_customers') }}
 
 {% if is_incremental() %}

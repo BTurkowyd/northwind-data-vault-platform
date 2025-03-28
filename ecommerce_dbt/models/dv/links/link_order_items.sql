@@ -20,10 +20,12 @@ hub_products AS (
 )
 -- The final SELECT statement generates the surrogate key for the link table
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['ho.hub_order_key', 'hp.hub_product_key']) }} AS link_order_item_key,
+    {{ dbt_utils.generate_surrogate_key(['ho.hub_order_key', 'hp.hub_product_key', 'sd.item_id']) }} AS link_order_item_key,
     ho.hub_order_key,
     hp.hub_product_key,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts
+    sd.item_id,
+    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    record_source
 FROM source_data sd
 -- The JOIN clause links the source_data and hub_orders CTEs on the order_id column
 JOIN hub_orders ho ON sd.order_id = ho.order_id

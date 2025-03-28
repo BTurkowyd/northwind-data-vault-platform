@@ -21,7 +21,7 @@ hub_products AS (
 ),
 -- The link_order_items CTE is a reference to the link_order_items model
 link_order_items AS (
-    SELECT hub_order_key, hub_product_key, link_order_item_key
+    SELECT hub_order_key, hub_product_key, link_order_item_key, item_id
     FROM {{ ref('link_order_items') }}
 ),
 -- The prepared CTE joins the source_data, hub_orders, hub_products, and link_order_items CTEs
@@ -39,6 +39,7 @@ prepared AS (
     JOIN link_order_items lo
         ON ho.hub_order_key = lo.hub_order_key
        AND hp.hub_product_key = lo.hub_product_key
+       AND sd.item_id = lo.item_id
 )
 -- The final SELECT statement generates the surrogate key for the satellite table
 SELECT
@@ -47,7 +48,8 @@ SELECT
     quantity,
     price,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts
+    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    record_source
 FROM prepared
 
 {% if is_incremental() %}

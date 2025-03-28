@@ -22,6 +22,11 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+vars:
+  dbt_project_name: "ecommerce_dbt"
+  dbt_project_version: "1.0.0"
+  record_source: "aurora-postgres"
+
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
