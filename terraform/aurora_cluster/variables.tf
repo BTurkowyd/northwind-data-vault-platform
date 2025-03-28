@@ -3,6 +3,11 @@ variable "name" {
     type        = string
 }
 
+variable "database_name" {
+    description = "The name of the database for the Aurora cluster"
+    type        = string
+}
+
 variable "aurora_password" {
     description = "The password for the Aurora cluster"
     type        = object({

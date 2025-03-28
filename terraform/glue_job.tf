@@ -25,11 +25,11 @@ resource "aws_security_group" "glue_sg" {
 
 module "glue_job" {
   source = "./glue_job"
-  aurora_cluster = aws_rds_cluster.aurora_cluster
+  aurora_cluster = module.dbt_data_vault.aurora_cluster
   stage = var.stage
   subnet = aws_subnet.public_subnet
   bucket = aws_s3_bucket.bucket
-  aurora_credentials_secret_arn = aws_secretsmanager_secret.aurora_secret.arn
+  aurora_credentials_secret_arn = module.dbt_data_vault.aurora_credentials_secret_arn
   aws_account_id = var.aws_account_id
   glue_sg = aws_security_group.glue_sg
 }

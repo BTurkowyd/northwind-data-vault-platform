@@ -5,7 +5,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   engine_mode            = "provisioned"
   engine_version         = "16.3"
   enable_http_endpoint = true
-  database_name          = "ecommerce_db"
+  database_name          = var.database_name
   master_username        = "master"
   master_password        = var.aurora_password.result
   storage_encrypted      = true

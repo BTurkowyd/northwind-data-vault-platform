@@ -31,84 +31,6 @@ resource "aws_security_group_rule" "aurora_ingress_glue" {
   source_security_group_id = aws_security_group.glue_sg.id
 }
 
-# Aurora Serverless Cluster
-resource "aws_rds_cluster" "aurora_cluster" {
-  cluster_identifier     = "dbt-data-vault-aurora-cluster"
-  engine                 = "aurora-postgresql"
-  engine_mode            = "provisioned"
-  engine_version         = "16.3"
-  enable_http_endpoint = true
-  database_name          = "ecommerce_db"
-  master_username        = "master"
-  master_password        = random_password.aurora_password.result
-  storage_encrypted      = true
-  skip_final_snapshot    = true
-  network_type           = "IPV4"
-  vpc_security_group_ids = [aws_security_group.aurora_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.aurora_subnet_group.name
-
-  serverlessv2_scaling_configuration {
-    min_capacity             = 0.0
-    max_capacity             = 1.0
-    seconds_until_auto_pause = 300
-  }
-
-  tags = {
-    Name = "dbt-data-vault-aurora-cluster"
-  }
-}
-
-resource "aws_rds_cluster" "northwind_cluster" {
-  cluster_identifier     = "northwind-aurora-cluster"
-  engine                 = "aurora-postgresql"
-  engine_mode            = "provisioned"
-  engine_version         = "16.3"
-  enable_http_endpoint = true
-  database_name          = "northwind_db"
-  master_username        = "master"
-  master_password        = random_password.aurora_password.result
-  storage_encrypted      = true
-  skip_final_snapshot    = true
-  network_type           = "IPV4"
-  vpc_security_group_ids = [aws_security_group.aurora_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.aurora_subnet_group.name
-
-  serverlessv2_scaling_configuration {
-    min_capacity             = 0.0
-    max_capacity             = 1.0
-    seconds_until_auto_pause = 300
-  }
-
-  tags = {
-    Name = "northwind-aurora-cluster"
-  }
-}
-
-# Aurora DB Instance (Required for the Cluster)
-resource "aws_rds_cluster_instance" "aurora_instance" {
-  cluster_identifier = aws_rds_cluster.aurora_cluster.id
-  identifier         = "dbt-data-vault-aurora-instance"
-  instance_class     = "db.serverless"
-  engine             = "aurora-postgresql"
-  engine_version     = aws_rds_cluster.aurora_cluster.engine_version
-
-  tags = {
-    Name = "dbt-data-vault-aurora-instance"
-  }
-}
-
-resource "aws_rds_cluster_instance" "northwind_instance" {
-  cluster_identifier = aws_rds_cluster.northwind_cluster.id
-  identifier         = "northwind-aurora-instance"
-  instance_class     = "db.serverless"
-  engine             = "aurora-postgresql"
-  engine_version     = aws_rds_cluster.northwind_cluster.engine_version
-
-  tags = {
-    Name = "northwind-aurora-instance"
-  }
-}
-
 # Aurora Subnet Group (Required for Multi-AZ)
 resource "aws_db_subnet_group" "aurora_subnet_group" {
   name       = "aurora-subnet-group"
@@ -126,34 +48,20 @@ resource "random_password" "aurora_password" {
   override_special = "_%@"
 }
 
-# Secret with the Aurora endpoint and credentials
-resource "aws_secretsmanager_secret" "aurora_secret" {
-  name = "dbt-data-vault-aurora-secret"
+module "dbt_data_vault" {
+  source = "./aurora_cluster"
+  name = "dbt-data-vault"
+  aurora_password = random_password.aurora_password
+  db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
+  sg_ids = [aws_security_group.aurora_sg.id]
+  database_name = "ecommerce_db"
 }
 
-resource "aws_secretsmanager_secret_version" "aurora_secret_version" {
-  secret_id     = aws_secretsmanager_secret.aurora_secret.id
-  secret_string = jsonencode({
-    host     = aws_rds_cluster.aurora_cluster.endpoint
-    port     = 5432
-    dbname   = aws_rds_cluster.aurora_cluster.database_name
-    username = aws_rds_cluster.aurora_cluster.master_username
-    password = random_password.aurora_password.result
-  })
+module "northwind" {
+  source = "./aurora_cluster"
+  name = "northwind"
+  aurora_password = random_password.aurora_password
+  db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
+  sg_ids = [aws_security_group.aurora_sg.id]
+  database_name = "northwind_db"
 }
-#
-# module "dbt_data_vault" {
-#   source = "./aurora_cluster"
-#   name = "dbt-data-vault"
-#   aurora_password = random_password.aurora_password.result
-#   db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
-#   sg_ids = [aws_security_group.aurora_sg.id]
-# }
-#
-# module "northwind" {
-#   source = "./aurora_cluster"
-#   name = "northwind"
-#   aurora_password = random_password.aurora_password.result
-#   db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
-#   sg_ids = [aws_security_group.aurora_sg.id]
-# }
