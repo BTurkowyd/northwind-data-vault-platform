@@ -3,21 +3,42 @@ import sys
 import boto3
 from awsglue.utils import getResolvedOptions
 from pyspark.sql import SparkSession
+import logging
+import os
 
-print("Starting Glue ETL job...")
+debug = os.environ.get('DEBUG', False)
+
+if debug:
+    logging.error(f"DEBUG: {debug}")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(filename)s:%(lineno)d | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+logging.info("Starting Glue ETL job...")
 
 # Get the Aurora credentials from Secrets Manager
 args = getResolvedOptions(sys.argv, ['AURORA_CREDS_SECRET', 'DESTINATION_BUCKET'])
+
+if debug:
+    logging.debug(f"ARGS: {args}")
+    logging.debug(f"Secrets Manager Secret: {args['AURORA_CREDS_SECRET']}")
+    logging.debug(f"Destination Bucket: {args['DESTINATION_BUCKET']}")
+
 client = boto3.client('secretsmanager', region_name='eu-central-1')
 
 try:
     secret = client.get_secret_value(SecretId=args['AURORA_CREDS_SECRET'])
     secrets = json.loads(secret['SecretString'])
-    print("Successfully retrieved Aurora credentials.")
-    print(secrets)
+    logging.info("Successfully retrieved Aurora credentials.")
+    if debug:
+        logging.debug(f"Secrets: {secrets}")
+
 
 except Exception as e:
-    print(f"ERROR: Failed to retrieve credentials from Secrets Manager: {e}")
+    logging.error(f"ERROR: Failed to retrieve credentials from Secrets Manager: {e}")
     sys.exit(1)
 
 spark = SparkSession.builder \
@@ -28,7 +49,9 @@ spark = SparkSession.builder \
     .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
     .getOrCreate()
 
-print("Current catalog:", spark.conf.get("spark.sql.defaultCatalog"))
+if debug:
+    logging.debug("Spark session created.")
+    logging.debug(f"Current catalog: {spark.conf.get('spark.sql.defaultCatalog')}")
 
 # Construct JDBC URL
 jdbc_url = f"jdbc:postgresql://{secrets['host']}:{secrets['port']}/{secrets['dbname']}"
@@ -55,9 +78,11 @@ try:
         .collect()
 
     table_names = [table['table_name'] for table in tables]
-    print("Tables in Aurora:", table_names)
+
+    logging.info("Successfully fetched table names from Aurora.")
+    logging.info(f"Tables in Aurora: {table_names}")
 except Exception as e:
-    print(f"ERROR: Failed to fetch table names from Aurora: {e}")
+    logging.error(f"ERROR: Failed to fetch table names from Aurora: {e}")
     sys.exit(1)
 
 # Load data from Aurora PostgreSQL from all tables
@@ -72,11 +97,11 @@ for table_name in table_names:
             .option("driver", "org.postgresql.Driver") \
             .load()
 
-        print(f"Successfully loaded data from {table_name}.")
+        logging.info(f"Successfully loaded data from {table_name}.")
         df.printSchema()  # Verify the schema
 
     except Exception as e:
-        print(f"ERROR: Failed to load data from {table_name}: {e}")
+        logging.error(f"ERROR: Failed to load data from {table_name}: {e}")
         sys.exit(1)
 
     # Register the DataFrame as a temporary SQL view
@@ -90,15 +115,15 @@ for table_name in table_names:
         TBLPROPERTIES ('format-version' = '2')
         AS SELECT * FROM tmp_{table_name}
         """)
-        print(f"Successfully wrote data to Iceberg table in Glue Catalog for {table_name}.")
+        logging.info(f"Successfully wrote data to Iceberg table in Glue Catalog for {table_name}.")
 
     except Exception as e:
-        print(f"ERROR: Failed to write Iceberg table to S3 for {table_name}: {e}")
+        logging.error(f"ERROR: Failed to write Iceberg table to S3 for {table_name}: {e}")
         sys.exit(1)
 
     del df  # Delete the DataFrame to free up memory
 
-print("Glue ETL job completed.")
+logging.info("Glue ETL job completed.")
 
 # End of script
 spark.stop()

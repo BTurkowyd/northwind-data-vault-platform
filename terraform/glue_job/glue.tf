@@ -45,6 +45,7 @@ resource "aws_glue_job" "glue_etl_job" {
     "--AURORA_CREDS_SECRET"              = var.aurora_credentials_secret_arn
     "--DESTINATION_BUCKET"               = var.bucket.id
     "--datalake-formats"                 = "iceberg"
+    "--DEBUG"                            = var.debug
   }
 
   glue_version       = "4.0"

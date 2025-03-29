@@ -26,3 +26,8 @@ variable "aws_account_id" {
 variable "glue_sg" {
   description = "The security group for the Glue job"
 }
+
+variable "debug" {
+    description = "Enable debug mode"
+    default = "false"
+}
