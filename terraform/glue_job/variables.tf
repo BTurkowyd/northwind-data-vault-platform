@@ -14,6 +14,10 @@ variable "bucket" {
   description = "The S3 bucket to store the Glue scripts"
 }
 
+variable "raw_data_directory" {
+    description = "The directory in the S3 bucket where the raw data is stored"
+}
+
 variable "aurora_credentials_secret_arn" {
     description = "The secret containing the Aurora credentials"
 }

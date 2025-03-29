@@ -1,6 +1,6 @@
 # AWS Glue role
 resource "aws_iam_role" "glue_role" {
-  name = "glue_role_dbt_data_vault_${var.stage}"
+  name = "glue_role_${var.raw_data_directory}_${var.stage}"
   assume_role_policy = jsonencode(
     {
       Version = "2012-10-17",
@@ -22,19 +22,19 @@ resource "aws_iam_role" "glue_role" {
 }
 
 resource "aws_iam_policy_attachment" "glue_s3_access" {
-  name       = "glue-s3-access-dbt-data-vault-${var.stage}"
+  name       = "glue_s3_access_${var.raw_data_directory}_${var.stage}"
   roles      = [aws_iam_role.glue_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_iam_policy_attachment" "glue_rds_access" {
-  name       = "glue-rds-access-dbt-data-vault-${var.stage}"
+  name       = "glue_rds_access_${var.raw_data_directory}_${var.stage}"
   roles      = [aws_iam_role.glue_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
 resource "aws_iam_policy" "glue_get_connection_policy" {
-  name        = "GlueGetConnectionPolicy"
+  name = "glue_get_connection_policy_${var.raw_data_directory}_${var.stage}"
   description = "Allows AWS Glue to retrieve Glue Connections"
 
   policy = jsonencode({
@@ -67,13 +67,13 @@ resource "aws_iam_role_policy_attachment" "glue_get_connection_attachment" {
 }
 
 resource "aws_iam_policy_attachment" "glue_logging" {
-  name       = "glue-cloudwatch-logging"
   roles      = [aws_iam_role.glue_role.name]
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+  name       = "glue_logging_${var.raw_data_directory}_${var.stage}"
 }
 
 resource "aws_iam_policy" "glue_secretsmanager_policy" {
-  name        = "GlueSecretsManagerAccessPolicy"
+  name = "glue_secretsmanager_policy_${var.raw_data_directory}_${var.stage}"
   description = "Allows AWS Glue to retrieve credentials from Secrets Manager"
 
   policy = jsonencode({
@@ -97,7 +97,7 @@ resource "aws_iam_role_policy_attachment" "glue_secretsmanager_attachment" {
 }
 
 resource "aws_iam_policy" "glue_vpc_access" {
-  name        = "GlueVPCNetworkingPolicy"
+  name = "glue_vpc_access_${var.raw_data_directory}_${var.stage}"
   description = "Allows Glue to access resources in a VPC"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -128,7 +128,7 @@ resource "aws_iam_role_policy_attachment" "glue_vpc_access_attachment" {
 }
 
 resource "aws_iam_policy" "get_caller_identity_policy" {
-  name        = "GetCallerIdentityPolicy"
+  name = "get_caller_identity_policy_${var.raw_data_directory}_${var.stage}"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

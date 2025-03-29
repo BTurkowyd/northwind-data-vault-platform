@@ -32,4 +32,16 @@ module "glue_job" {
   aurora_credentials_secret_arn = module.dbt_data_vault.aurora_credentials_secret_arn
   aws_account_id = var.aws_account_id
   glue_sg = aws_security_group.glue_sg
+  raw_data_directory = "ecommerce_iceberg"
+}
+
+module "northwind_glue_job" {
+  source = "./glue_job"
+  aurora_cluster = module.northwind.aurora_cluster
+  aurora_credentials_secret_arn = module.northwind.aurora_credentials_secret_arn
+  bucket = aws_s3_bucket.bucket
+  glue_sg = aws_security_group.glue_sg
+  stage = var.stage
+  subnet = aws_subnet.public_subnet
+  raw_data_directory = "northwind_iceberg"
 }
