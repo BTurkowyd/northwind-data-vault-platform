@@ -1,16 +1,16 @@
 resource "aws_glue_catalog_database" "glue_db" {
-  name = "ecommerce_db_${var.stage}"
+  name = "${var.raw_data_directory}_${var.stage}"
 
   tags = {
-    Name = "Glue Iceberg Database for ecommerce"
+    Name = "Glue Iceberg Database for ${var.raw_data_directory} in ${var.stage}"
   }
 }
 
 resource "aws_glue_connection" "glue_rds_connection" {
-  name = "ecommerce-aurora-postgres-connection-${var.stage}"
+  name = "${replace(var.raw_data_directory, "_", "-")}-postgres-connection-${var.stage}"
 
   connection_properties = {
-    "JDBC_CONNECTION_URL" = "jdbc:postgresql://${var.aurora_cluster.endpoint}:5432/ecommerce_db"
+    "JDBC_CONNECTION_URL" = "jdbc:postgresql://${var.aurora_cluster.endpoint}:5432/${var.aurora_cluster.database_name}"
     "USERNAME"            = var.aurora_cluster.master_username
     "PASSWORD"            = var.aurora_cluster.master_password
   }
@@ -23,14 +23,14 @@ resource "aws_glue_connection" "glue_rds_connection" {
 }
 
 resource "aws_glue_job" "glue_etl_job" {
-  name     = "ecommerce-aurora-to-s3-etl-${var.stage}"
+  name     = "${replace(var.raw_data_directory, "_", "-")}-aurora-to-s3-etl-${var.stage}"
   role_arn = aws_iam_role.glue_role.arn
   timeout  = 30
 
   connections = [aws_glue_connection.glue_rds_connection.name]
 
   command {
-    script_location = "s3://${var.bucket.bucket}/scripts/glue_etl.py"
+    script_location = "s3://${var.bucket.bucket}/scripts/${var.raw_data_directory}_etl.py"
     python_version  = "3"
   }
 
@@ -44,6 +44,8 @@ resource "aws_glue_job" "glue_etl_job" {
     "--region"                           = "eu-central-1"
     "--AURORA_CREDS_SECRET"              = var.aurora_credentials_secret_arn
     "--DESTINATION_BUCKET"               = var.bucket.id
+    "--DESTINATION_DIRECTORY"            = var.raw_data_directory
+    "--GLUE_DATABASE"                          = aws_glue_catalog_database.glue_db.name
     "--datalake-formats"                 = "iceberg"
     "--DEBUG"                            = var.debug
   }
@@ -56,7 +58,7 @@ resource "aws_glue_job" "glue_etl_job" {
 # s3 object with the glue python script
 resource "aws_s3_object" "glue_etl_script" {
   bucket = var.bucket.bucket
-  key    = "scripts/glue_etl.py"
+  key    = "scripts/${var.raw_data_directory}_etl.py"
   source = "${path.module}/src/glue_etl.py"
   etag   = filemd5("${path.module}/src/glue_etl.py")
 }
