@@ -9,7 +9,6 @@ dbt-run:
 		echo "Error: PROJECT_DIR variable is required. Usage: make dbt-run PROJECT_DIR=project_dir"; \
 		exit 1; \
 	fi
-	@echo "✅ Creating table: $(TABLE)"
 	. .venv/bin/activate && dbt run --project-dir $(PROJECT_DIR)
 
 # Run dbt full refresh
