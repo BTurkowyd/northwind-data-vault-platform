@@ -1,7 +1,7 @@
-# Install python venv in .venv. Install dbt, dbt-athena-community in venv.
+# Install python venv in .venv. Install dbt, dbt-athena-community, dbt-utils in venv.
 setup-data-vault:
 	python3. -m venv .venv
-	. .venv/bin/activate && pip install dbt dbt-athena-community
+	. .venv/bin/activate && pip install dbt dbt-athena-community dbt-utils
 
 # Run dbt default run.
 dbt-run:
