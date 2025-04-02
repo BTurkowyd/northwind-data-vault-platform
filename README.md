@@ -11,39 +11,11 @@ This project builds a modern, scalable data warehouse architecture using:
 The goal is to demonstrate how to build a production-grade, cloud-native analytical platform for batch data processing 
 and historical tracking using open standards and managed AWS services.
 
-## Architecture Overview
-```ascii
-          +-----------------------+
-          |     Source System     |
-          |    (Aurora Postgres)  |
-          +----------+------------+
-                         |
-                         ▼
-        +-------------------------------+
-        |     AWS Glue ETL (Python)     |
-        | Extract from Aurora, write to |
-        | Iceberg tables in S3          |
-        +-------------------------------+
-                         |
-                         ▼
-        +-------------------------------+
-        |   Iceberg Tables on S3        |
-        |   Raw Layer (Partitioned)     |
-        +-------------------------------+
-                         |
-                         ▼
-        +-------------------------------+
-        |       dbt (Data Vault)        |
-        | Hubs, Links, Satellites       |
-        | Query via Athena              |
-        +-------------------------------+
-                         |
-                         ▼
-        [Coming Soon: Marts, PITs, Bridges]
-
-```
 ---
+## Architecture Overview
+![architecture_overview.png](assets/architecture_overview.png)
 
+---
 ## 🔧 Infrastructure Setup and Tools
 
 ### 📦 Tools You’ll Need
@@ -69,13 +41,13 @@ Make sure you have the following installed:
 This project provisions the following infrastructure using Terraform + Terragrunt:
 
 - **VPC with Public & Private Subnets**  
-  👉 Provides network isolation and control over traffic routing.
+  - Provides network isolation and control over traffic routing.
 
 - **NAT Gateway + VPC Endpoints**  
-  👉 Ensures secure, private connectivity to AWS services (Glue, S3, Secrets Manager, etc.) from private subnets.
+  - Ensures secure, private connectivity to AWS services (Glue, S3, Secrets Manager, etc.) from private subnets.
 
 - **Aurora PostgreSQL Cluster**  
-  👉 Acts as the operational source database for ingestion.
+  - Acts as the operational source database for ingestion.
 
 - **S3 Buckets**  
   - Iceberg table storage
@@ -83,7 +55,7 @@ This project provisions the following infrastructure using Terraform + Terragrun
   - Glue ETL scripts
 
 - **AWS Glue Jobs**  
-  👉 Responsible for transforming and exporting data from Aurora to Iceberg tables.
+  - Responsible for transforming and exporting data from Aurora to Iceberg tables.
   - Glue version: `4.0`
   - Worker type: `G.1X`
   - Number of workers: `2`
@@ -91,10 +63,10 @@ This project provisions the following infrastructure using Terraform + Terragrun
   - Integrated with Secrets Manager and Data Catalog
 
 - **Glue Data Catalog**  
-  👉 Configured to manage Apache Iceberg tables (partitioned, versioned, and incremental).
+  - Configured to manage Apache Iceberg tables (partitioned, versioned, and incremental).
 
 - **IAM Roles and Policies**  
-  👉 Fine-grained access for Glue, S3, Secrets Manager, and other services.
+  - Fine-grained access for Glue, S3, Secrets Manager, and other services.
 
 ---
 
@@ -190,6 +162,9 @@ This project uses standard Data Vault layers:
 - **Partitioning by date in Iceberg** – Automatically handled through dbt + Glue, optimizing query performance and storage.
 
 ---
+### 📊 Data Vault Model Diagram
+![data_vault_structure.png](assets/data_vault_structure.png)
+---
 ### 🧪 Running dbt
 
 Install dbt dependencies and run the models:
@@ -202,3 +177,48 @@ dbt run --full-refresh   # full rebuild (use carefully)
 dbt docs generate        # generate documentation
 dbt docs serve           # view documentation
 ```
+
+---
+## Future Enhancements & Roadmap
+
+## ✅ Testing & Quality Assurance
+
+The aim is to ensure data accuracy, consistency, and reliability through the following measures:
+
+- **dbt Tests**
+  - `unique` and `not_null` tests on hub primary keys and link composite keys
+  - `accepted_values` for enums (e.g. order status)
+- **Hashdiff logic in Satellites**
+  - Ensures only changed records are added (SCD Type 2 behavior)
+- **Potential improvements**
+  - Add row count checks across layers (raw → vault)
+  - Validate foreign key relationships between hubs, links, and satellites
+
+---
+## ⚙️ Deployment & Automation
+
+Currently, this project is executed manually, but it’s designed with automation-readiness in mind.
+
+- **Manual Flow**
+  - Terraform/Terragrunt for infrastructure
+  - AWS Glue console for ETL
+  - `dbt run` for transformations
+  - `dbt docs generate` for documentation
+- **Future Automation Ideas**
+  - **Orchestration** via:
+    - AWS CodePipeline
+    - AWS ECS Fargate
+  - **Triggering ETL** on schedule or based on data arrival
+
+
+---
+## 🌱 Future Enhancements & Roadmap
+
+Here's what could be explored next:
+
+- [ ] **Point-In-Time (PIT) Tables** for snapshot-style historical joins
+- [ ] **Bridge Tables** for many-to-many relationships (e.g. products in orders)
+- [ ] **Data Marts** built on top of the vault (star schema views)
+- [ ] **Automated data loading** into Aurora via CDC or batch ingestion
+- [ ] **dbt CI/CD pipeline** to run tests and preview docs on pull requests
+- [ ] **Support for multiple environments** (dev, staging, prod)
