@@ -7,3 +7,12 @@ ecommerce_dbt:
       region_name: eu-central-1
       database: ecommerce_db_dev
       work_group: primary
+northwind_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: athena
+      s3_staging_dir: "{{ env_var('ATHENA_STAGING_DIR') }}"
+      region_name: eu-central-1
+      database: ecommerce_db_dev
+      work_group: primary
