@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='sat_order_product_key',
     merge_update_columns=['unit_price', 'quantity', 'discount', 'hashdiff', 'load_ts', 'record_source']
 ) }}

@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='sat_territory_key',
     merge_update_columns=['hashdiff', 'load_ts', 'territory_description', 'region_id', 'record_source']
 ) }}

@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='sat_customer_key',
     merge_update_columns=['hashdiff', 'load_ts', 'company_name', 'contact_name', 'contact_title', 'address', 'city', 'region', 'postal_code', 'country', 'phone', 'fax']
 ) }}

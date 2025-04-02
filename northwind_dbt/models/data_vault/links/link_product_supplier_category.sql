@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='link_product_supp_cat_key'
 ) }}
 

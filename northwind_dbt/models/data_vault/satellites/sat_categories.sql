@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='sat_category_key',
     merge_update_columns=['hashdiff', 'category_name', 'description', 'picture', 'load_ts', 'record_source']
 ) }}

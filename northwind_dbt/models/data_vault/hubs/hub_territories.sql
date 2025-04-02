@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='hub_territory_key',
     merge_update_columns=['territory_id', 'load_ts', 'record_source']
 ) }}

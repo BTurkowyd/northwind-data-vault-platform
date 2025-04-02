@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='hub_customer_type_key',
     merge_update_columns=['customer_type_id', 'load_ts', 'record_source']
 ) }}

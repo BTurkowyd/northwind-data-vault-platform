@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='sat_shipper_key',
     merge_update_columns=['company_name', 'phone', 'hashdiff', 'load_ts', 'record_source']
 ) }}

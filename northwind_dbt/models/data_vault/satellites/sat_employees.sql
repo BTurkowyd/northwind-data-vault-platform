@@ -1,8 +1,4 @@
 {{ config(
-    materialized='incremental',
-    table_type='iceberg',
-    format='parquet',
-    incremental_strategy='merge',
     unique_key='sat_employee_key',
     merge_update_columns=[
         'hashdiff', 'load_ts', 'last_name', 'first_name', 'title', 'title_of_courtesy',
