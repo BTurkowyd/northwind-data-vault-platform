@@ -35,14 +35,18 @@ repos:
 
   # SQLFluff for dbt/Athena
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 2.3.5
+    rev: 3.3.1
     hooks:
       - id: sqlfluff-lint
-        args: ["--dialect=athena"]
-        language_version: python3.11
+        additional_dependencies:
+          - sqlfluff-templater-dbt==3.3.1
+          - dbt-core==1.9.2
+        files: ^northwind_dbt/
       - id: sqlfluff-fix
-        args: ["--dialect=athena"]
-        language_version: python3.11
+        additional_dependencies:
+          - sqlfluff-templater-dbt==3.3.1
+          - dbt-core==1.9.2
+        files: ^northwind_dbt/
 
 default_stages: [commit]
 exclude: ^(\.sqlfluff|\.dbt)/.*

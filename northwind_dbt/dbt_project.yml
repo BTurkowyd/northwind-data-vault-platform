@@ -25,7 +25,9 @@ vars:
 
 models:
   northwind_dbt:
-    +materialized: incremental
     +table_type: iceberg
     +format: parquet
-    +incremental_strategy: merge
+    models:
+      data_vault:
+        +materialized: incremental
+        +incremental_strategy: merge
