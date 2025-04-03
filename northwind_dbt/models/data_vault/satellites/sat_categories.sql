@@ -7,9 +7,13 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_categories') }}
 ),
+
 -- The hub keys
 hub_keys AS (
-    SELECT category_id, hub_category_key FROM {{ ref('hub_categories') }}
+    SELECT
+category_id,
+hub_category_key
+FROM {{ ref('hub_categories') }}
 )
 
 SELECT
@@ -20,15 +24,16 @@ SELECT
     sd.picture,
     sd.record_source,
     sd.hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts
 FROM (
     -- The source data with hashdiff
-    SELECT *,
+    SELECT
+*,
            {{ dbt_utils.generate_surrogate_key(['category_name', 'description']) }} AS hashdiff
     FROM source_data
-) sd
+) AS sd
 -- Join with the hub keys
-JOIN hub_keys hk ON sd.category_id = hk.category_id
+INNER JOIN hub_keys AS hk ON sd.category_id = hk.category_id
 
 {% if is_incremental() %}
 WHERE sd.hashdiff NOT IN (SELECT hashdiff FROM {{ this }})

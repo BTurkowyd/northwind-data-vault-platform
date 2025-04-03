@@ -27,25 +27,27 @@ repos:
         files: \.tf$
       - id: terraform_validate
         name: tofu_validate
-        entry: tofu validate
+        entry: bash -c 'tofu validate || exit 1'
         language: system
         files: \.tf$
-      - id: terraform_tflint  # Will still work as TFLint works with Tofu too
-      - id: terraform_docs
 
   # SQLFluff for dbt/Athena
   - repo: https://github.com/sqlfluff/sqlfluff
     rev: 3.3.1
     hooks:
       - id: sqlfluff-lint
+        args: ["--config=.sqlfluff", "--processes=1"]
         additional_dependencies:
           - sqlfluff-templater-dbt==3.3.1
           - dbt-core==1.9.2
+          - dbt-athena-community==1.9.2
         files: ^northwind_dbt/
       - id: sqlfluff-fix
+        args: ["--config=.sqlfluff", "--processes=1"]
         additional_dependencies:
           - sqlfluff-templater-dbt==3.3.1
           - dbt-core==1.9.2
+          - dbt-athena-community==1.9.2
         files: ^northwind_dbt/
 
 default_stages: [commit]

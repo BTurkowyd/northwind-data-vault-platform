@@ -6,14 +6,19 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_customer_demographic') }}
 ),
+
 hub_keys AS (
-    SELECT customer_type_id, hub_customer_type_key FROM {{ ref('hub_customer_types') }}
+    SELECT
+customer_type_id,
+hub_customer_type_key
+FROM {{ ref('hub_customer_types') }}
 ),
+
 prepared AS (
     SELECT
         sd.*,
         {{ dbt_utils.generate_surrogate_key(['sd.customer_desc']) }} AS hashdiff
-    FROM source_data sd
+    FROM source_data AS sd
 )
 
 SELECT
@@ -22,9 +27,9 @@ SELECT
     p.customer_desc,
     p.hashdiff,
     p.record_source,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts
-FROM prepared p
-JOIN hub_keys hk ON p.customer_type_id = hk.customer_type_id
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts
+FROM prepared AS p
+INNER JOIN hub_keys AS hk ON p.customer_type_id = hk.customer_type_id
 
 {% if is_incremental() %}
 WHERE p.hashdiff NOT IN (SELECT hashdiff FROM {{ this }})

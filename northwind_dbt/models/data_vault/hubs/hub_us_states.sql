@@ -6,7 +6,7 @@
 SELECT
     {{ dbt_utils.generate_surrogate_key(['state_id']) }} AS hub_state_key,
     state_id,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM {{ ref('stg_us_states') }}
 

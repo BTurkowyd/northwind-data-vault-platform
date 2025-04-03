@@ -6,7 +6,7 @@
 SELECT
     {{ dbt_utils.generate_surrogate_key(['product_id']) }} AS hub_product_key,
     product_id,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM {{ ref('stg_products') }}
 
