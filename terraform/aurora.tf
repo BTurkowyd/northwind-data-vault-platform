@@ -48,14 +48,6 @@ resource "random_password" "aurora_password" {
   override_special = "_%@"
 }
 
-module "dbt_data_vault" {
-  source = "./aurora_cluster"
-  name = "dbt-data-vault"
-  aurora_password = random_password.aurora_password
-  db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
-  sg_ids = [aws_security_group.aurora_sg.id]
-  database_name = "ecommerce_db"
-}
 
 module "northwind" {
   source = "./aurora_cluster"
