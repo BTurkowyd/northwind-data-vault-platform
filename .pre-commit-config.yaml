@@ -1,0 +1,48 @@
+repos:
+  # Basic formatting checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: check-json
+
+  # Python formatter (e.g., Glue ETL scripts)
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  # Tofu (Terraform fork) formatting via shell hooks
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.84.0
+    hooks:
+      - id: terraform_fmt
+        name: tofu_fmt
+        entry: tofu fmt -recursive
+        language: system
+        files: \.tf$
+      - id: terraform_validate
+        name: tofu_validate
+        entry: tofu validate
+        language: system
+        files: \.tf$
+      - id: terraform_tflint  # Will still work as TFLint works with Tofu too
+      - id: terraform_docs
+
+  # SQLFluff for dbt/Athena
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 2.3.5
+    hooks:
+      - id: sqlfluff-lint
+        args: ["--dialect=athena"]
+        language_version: python3.11
+      - id: sqlfluff-fix
+        args: ["--dialect=athena"]
+        language_version: python3.11
+
+default_stages: [commit]
+exclude: ^(\.sqlfluff|\.dbt)/.*

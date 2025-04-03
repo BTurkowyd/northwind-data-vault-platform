@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 dbt-athena-community = "==1.9.2"
+pre-commit = {version = ">=4.2.0", markers = "python_version >= '3.12'"}
+sqlfluff = {extras = ["dbt"], version = "*" }
 
 [dev-packages]
 

@@ -8,7 +8,7 @@ This project builds a modern, scalable data warehouse architecture using:
 - Amazon Athena as the query engine
 - Terraform for infrastructure provisioning
 
-The goal is to demonstrate how to build a production-grade, cloud-native analytical platform for batch data processing 
+The goal is to demonstrate how to build a production-grade, cloud-native analytical platform for batch data processing
 and historical tracking using open standards and managed AWS services.
 
 ---
@@ -31,7 +31,7 @@ Make sure you have the following installed:
 - [dbt CLI](https://docs.getdbt.com/docs/core/cli/installation)
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
 
-> 🧭 **Region:** This project is configured for the `eu-central-1` region by default.  
+> 🧭 **Region:** This project is configured for the `eu-central-1` region by default.
 > 🏗️ **Environment:** All Terraform modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
 
 ---
@@ -40,21 +40,21 @@ Make sure you have the following installed:
 
 This project provisions the following infrastructure using Terraform + Terragrunt:
 
-- **VPC with Public & Private Subnets**  
+- **VPC with Public & Private Subnets**
   - Provides network isolation and control over traffic routing.
 
-- **NAT Gateway + VPC Endpoints**  
+- **NAT Gateway + VPC Endpoints**
   - Ensures secure, private connectivity to AWS services (Glue, S3, Secrets Manager, etc.) from private subnets.
 
-- **Aurora PostgreSQL Cluster**  
+- **Aurora PostgreSQL Cluster**
   - Acts as the operational source database for ingestion.
 
-- **S3 Buckets**  
+- **S3 Buckets**
   - Iceberg table storage
   - Athena query results
   - Glue ETL scripts
 
-- **AWS Glue Jobs**  
+- **AWS Glue Jobs**
   - Responsible for transforming and exporting data from Aurora to Iceberg tables.
   - Glue version: `4.0`
   - Worker type: `G.1X`
@@ -62,10 +62,10 @@ This project provisions the following infrastructure using Terraform + Terragrun
   - Script stored in S3
   - Integrated with Secrets Manager and Data Catalog
 
-- **Glue Data Catalog**  
+- **Glue Data Catalog**
   - Configured to manage Apache Iceberg tables (partitioned, versioned, and incremental).
 
-- **IAM Roles and Policies**  
+- **IAM Roles and Policies**
   - Fine-grained access for Glue, S3, Secrets Manager, and other services.
 
 ---
@@ -81,7 +81,7 @@ terragrunt apply
 
 ---
 ### 💾 State Management & Best Practices
-- Terraform State: 
+- Terraform State:
   - Stored remotely using S3 and DynamoDB to enable team collaboration and avoid state conflicts.
   (You can customize this if you use a different backend setup.)
 - Cost Control Tips:
@@ -111,13 +111,13 @@ This project uses **AWS Glue** and **Apache Iceberg** to extract data from an **
 
 ### 📦 ETL Flow Summary
 
-1. **Extract**:  
+1. **Extract**:
    AWS Glue connects to the Aurora PostgreSQL instance using JDBC. Secrets are securely retrieved from AWS Secrets Manager.
 
-2. **Transform**:  
+2. **Transform**:
    Glue reads data using Spark and applies any lightweight transformations if needed.
 
-3. **Load**:  
+3. **Load**:
    Data is written into Iceberg tables stored in S3, with metadata tracked in the AWS Glue Data Catalog.
 
 ---

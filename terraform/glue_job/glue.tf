@@ -18,7 +18,7 @@ resource "aws_glue_connection" "glue_rds_connection" {
   physical_connection_requirements {
     availability_zone      = var.subnet.availability_zone
     security_group_id_list = [var.glue_sg.id]
-    subnet_id             = var.subnet.id
+    subnet_id              = var.subnet.id
   }
 }
 
@@ -45,14 +45,14 @@ resource "aws_glue_job" "glue_etl_job" {
     "--AURORA_CREDS_SECRET"              = var.aurora_credentials_secret_arn
     "--DESTINATION_BUCKET"               = var.bucket.id
     "--DESTINATION_DIRECTORY"            = var.raw_data_directory
-    "--GLUE_DATABASE"                          = aws_glue_catalog_database.glue_db.name
+    "--GLUE_DATABASE"                    = aws_glue_catalog_database.glue_db.name
     "--datalake-formats"                 = "iceberg"
     "--DEBUG"                            = var.debug
   }
 
-  glue_version       = "4.0"
-  worker_type        = "G.1X"
-  number_of_workers  = 2
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
 }
 
 # s3 object with the glue python script

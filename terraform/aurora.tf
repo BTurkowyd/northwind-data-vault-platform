@@ -50,10 +50,10 @@ resource "random_password" "aurora_password" {
 
 
 module "northwind" {
-  source = "./aurora_cluster"
-  name = "northwind"
-  aurora_password = random_password.aurora_password
+  source               = "./aurora_cluster"
+  name                 = "northwind"
+  aurora_password      = random_password.aurora_password
   db_subnet_group_name = aws_db_subnet_group.aurora_subnet_group.name
-  sg_ids = [aws_security_group.aurora_sg.id]
-  database_name = "northwind_db"
+  sg_ids               = [aws_security_group.aurora_sg.id]
+  database_name        = "northwind_db"
 }

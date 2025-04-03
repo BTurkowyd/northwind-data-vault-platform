@@ -1,0 +1,7 @@
+[sqlfluff]
+templater = dbt
+dialect = athena
+
+[sqlfluff.templater.dbt]
+project_dir = northwind_dbt
+profiles_dir = ~/.dbt
