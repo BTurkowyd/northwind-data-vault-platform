@@ -8,16 +8,16 @@ WITH source_data AS (
 
 hub_employees AS (
     SELECT
-employee_id,
-hub_employee_key
-FROM {{ ref('hub_employees') }}
+        employee_id,
+        hub_employee_key
+    FROM {{ ref('hub_employees') }}
 ),
 
 hub_territories AS (
     SELECT
-territory_id,
-hub_territory_key
-FROM {{ ref('hub_territories') }}
+        territory_id,
+        hub_territory_key
+    FROM {{ ref('hub_territories') }}
 )
 
 SELECT

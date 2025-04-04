@@ -2,7 +2,7 @@
 dialect = athena
 templater = dbt
 max_line_length = 120
-exclude_rules = LT02, LT05
+exclude_rules = LT05
 
 [sqlfluff:templater:dbt]
 project_dir = northwind_dbt

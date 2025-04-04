@@ -11,9 +11,9 @@ WITH source_data AS (
 -- The hub keys
 hub_keys AS (
     SELECT
-category_id,
-hub_category_key
-FROM {{ ref('hub_categories') }}
+        category_id,
+        hub_category_key
+    FROM {{ ref('hub_categories') }}
 )
 
 SELECT
@@ -28,8 +28,8 @@ SELECT
 FROM (
     -- The source data with hashdiff
     SELECT
-*,
-           {{ dbt_utils.generate_surrogate_key(['category_name', 'description']) }} AS hashdiff
+        *,
+        {{ dbt_utils.generate_surrogate_key(['category_name', 'description']) }} AS hashdiff
     FROM source_data
 ) AS sd
 -- Join with the hub keys

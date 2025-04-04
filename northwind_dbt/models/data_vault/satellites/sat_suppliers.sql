@@ -9,9 +9,9 @@ WITH source_data AS (
 
 hub_keys AS (
     SELECT
-supplier_id,
-hub_supplier_key
-FROM {{ ref('hub_suppliers') }}
+        supplier_id,
+        hub_supplier_key
+    FROM {{ ref('hub_suppliers') }}
 ),
 
 prepared AS (

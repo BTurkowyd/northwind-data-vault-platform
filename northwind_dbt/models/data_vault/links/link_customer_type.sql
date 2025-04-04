@@ -9,16 +9,16 @@ WITH source_data AS (
 
 hub_customers AS (
     SELECT
-customer_id,
-hub_customer_key
-FROM {{ ref('hub_customer_customer_demo') }}
+        customer_id,
+        hub_customer_key
+    FROM {{ ref('hub_customer_customer_demo') }}
 ),
 
 hub_customer_types AS (
     SELECT
-customer_type_id,
-hub_customer_type_key
-FROM {{ ref('hub_customer_types') }}
+        customer_type_id,
+        hub_customer_type_key
+    FROM {{ ref('hub_customer_types') }}
 )
 
 SELECT

@@ -9,23 +9,23 @@ WITH source_data AS (
 
 hub_orders AS (
     SELECT
-order_id,
-hub_order_key
-FROM {{ ref('hub_orders') }}
+        order_id,
+        hub_order_key
+    FROM {{ ref('hub_orders') }}
 ),
 
 hub_products AS (
     SELECT
-product_id,
-hub_product_key
-FROM {{ ref('hub_products') }}
+        product_id,
+        hub_product_key
+    FROM {{ ref('hub_products') }}
 ),
 
 link_order_products AS (
     SELECT
-hub_order_key,
-hub_product_key,
-link_order_product_key
+        hub_order_key,
+        hub_product_key,
+        link_order_product_key
     FROM {{ ref('link_order_products') }}
 ),
 
@@ -38,8 +38,9 @@ prepared AS (
     INNER JOIN hub_orders AS ho ON sd.order_id = ho.order_id
     INNER JOIN hub_products AS hp ON sd.product_id = hp.product_id
     INNER JOIN link_order_products AS lop
-        ON ho.hub_order_key = lop.hub_order_key
-       AND hp.hub_product_key = lop.hub_product_key
+        ON
+            ho.hub_order_key = lop.hub_order_key
+            AND hp.hub_product_key = lop.hub_product_key
 )
 
 SELECT

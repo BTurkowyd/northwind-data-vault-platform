@@ -9,9 +9,9 @@ WITH source_data AS (
 
 hub_orders AS (
     SELECT
-order_id,
-hub_order_key
-FROM {{ ref('hub_orders') }}
+        order_id,
+        hub_order_key
+    FROM {{ ref('hub_orders') }}
 ),
 
 prepared AS (

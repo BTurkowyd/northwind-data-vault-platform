@@ -8,23 +8,23 @@ WITH source_data AS (
 
 hub_products AS (
     SELECT
-product_id,
-hub_product_key
-FROM {{ ref('hub_products') }}
+        product_id,
+        hub_product_key
+    FROM {{ ref('hub_products') }}
 ),
 
 hub_suppliers AS (
     SELECT
-supplier_id,
-hub_supplier_key
-FROM {{ ref('hub_suppliers') }}
+        supplier_id,
+        hub_supplier_key
+    FROM {{ ref('hub_suppliers') }}
 ),
 
 hub_categories AS (
     SELECT
-category_id,
-hub_category_key
-FROM {{ ref('hub_categories') }}
+        category_id,
+        hub_category_key
+    FROM {{ ref('hub_categories') }}
 )
 
 SELECT

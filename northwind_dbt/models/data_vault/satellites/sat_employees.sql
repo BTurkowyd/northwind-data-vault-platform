@@ -13,9 +13,9 @@ WITH source_data AS (
 
 hub_keys AS (
     SELECT
-employee_id,
-hub_employee_key
-FROM {{ ref('hub_employees') }}
+        employee_id,
+        hub_employee_key
+    FROM {{ ref('hub_employees') }}
 ),
 
 prepared AS (

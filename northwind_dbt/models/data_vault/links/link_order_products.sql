@@ -8,16 +8,16 @@ WITH source_data AS (
 
 hub_orders AS (
     SELECT
-order_id,
-hub_order_key
-FROM {{ ref('hub_orders') }}
+        order_id,
+        hub_order_key
+    FROM {{ ref('hub_orders') }}
 ),
 
 hub_products AS (
     SELECT
-product_id,
-hub_product_key
-FROM {{ ref('hub_products') }}
+        product_id,
+        hub_product_key
+    FROM {{ ref('hub_products') }}
 )
 
 SELECT

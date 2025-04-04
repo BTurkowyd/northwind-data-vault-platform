@@ -8,23 +8,23 @@ WITH source_data AS (
 
 hub_orders AS (
     SELECT
-order_id,
-hub_order_key
-FROM {{ ref('hub_orders') }}
+        order_id,
+        hub_order_key
+    FROM {{ ref('hub_orders') }}
 ),
 
 hub_customers AS (
     SELECT
-customer_id,
-hub_customer_key
-FROM {{ ref('hub_customers') }}
+        customer_id,
+        hub_customer_key
+    FROM {{ ref('hub_customers') }}
 ),
 
 hub_employees AS (
     SELECT
-employee_id,
-hub_employee_key
-FROM {{ ref('hub_employees') }}
+        employee_id,
+        hub_employee_key
+    FROM {{ ref('hub_employees') }}
 )
 
 SELECT
