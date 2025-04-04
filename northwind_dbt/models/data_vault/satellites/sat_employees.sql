@@ -10,9 +10,14 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_employees') }}
 ),
+
 hub_keys AS (
-    SELECT employee_id, hub_employee_key FROM {{ ref('hub_employees') }}
+    SELECT
+        employee_id,
+        hub_employee_key
+    FROM {{ ref('hub_employees') }}
 ),
+
 prepared AS (
     SELECT
         sd.*,
@@ -35,8 +40,8 @@ prepared AS (
             'sd.reports_to',
             'sd.photo_path'
         ]) }} AS hashdiff
-    FROM source_data sd
-    JOIN hub_keys hk ON sd.employee_id = hk.employee_id
+    FROM source_data AS sd
+    INNER JOIN hub_keys AS hk ON sd.employee_id = hk.employee_id
 )
 
 SELECT
@@ -60,7 +65,7 @@ SELECT
     reports_to,
     photo_path,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM prepared
 

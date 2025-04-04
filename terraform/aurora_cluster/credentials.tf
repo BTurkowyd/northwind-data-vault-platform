@@ -3,7 +3,7 @@ resource "aws_secretsmanager_secret" "aurora_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "aurora_secret_version" {
-  secret_id     = aws_secretsmanager_secret.aurora_secret.id
+  secret_id = aws_secretsmanager_secret.aurora_secret.id
   secret_string = jsonencode({
     host     = aws_rds_cluster.aurora_cluster.endpoint
     port     = 5432

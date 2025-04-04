@@ -6,16 +6,21 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_us_states') }}
 ),
+
 hub_keys AS (
-    SELECT state_id, hub_state_key FROM {{ ref('hub_us_states') }}
+    SELECT
+        state_id,
+        hub_state_key
+    FROM {{ ref('hub_us_states') }}
 ),
+
 prepared AS (
     SELECT
         sd.*,
         hk.hub_state_key,
         {{ dbt_utils.generate_surrogate_key(['sd.state_name', 'sd.state_abbr', 'sd.state_region']) }} AS hashdiff
-    FROM source_data sd
-    JOIN hub_keys hk ON sd.state_id = hk.state_id
+    FROM source_data AS sd
+    INNER JOIN hub_keys AS hk ON sd.state_id = hk.state_id
 )
 
 SELECT
@@ -25,7 +30,7 @@ SELECT
     state_abbr,
     state_region,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM prepared
 

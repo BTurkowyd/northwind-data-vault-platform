@@ -6,9 +6,14 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_products') }}
 ),
+
 hub_products AS (
-    SELECT product_id, hub_product_key FROM {{ ref('hub_products') }}
+    SELECT
+        product_id,
+        hub_product_key
+    FROM {{ ref('hub_products') }}
 ),
+
 prepared AS (
     SELECT
         sd.*,
@@ -22,8 +27,8 @@ prepared AS (
             'sd.reorder_level',
             'sd.discontinued'
         ]) }} AS hashdiff
-    FROM source_data sd
-    JOIN hub_products hp ON sd.product_id = hp.product_id
+    FROM source_data AS sd
+    INNER JOIN hub_products AS hp ON sd.product_id = hp.product_id
 )
 
 SELECT
@@ -37,7 +42,7 @@ SELECT
     reorder_level,
     discontinued,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM prepared
 

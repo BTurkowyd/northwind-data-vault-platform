@@ -8,7 +8,7 @@ This project builds a modern, scalable data warehouse architecture using:
 - Amazon Athena as the query engine
 - Terraform for infrastructure provisioning
 
-The goal is to demonstrate how to build a production-grade, cloud-native analytical platform for batch data processing 
+The goal is to demonstrate how to build a production-grade, cloud-native analytical platform for batch data processing
 and historical tracking using open standards and managed AWS services.
 
 ---
@@ -23,16 +23,17 @@ and historical tracking using open standards and managed AWS services.
 Make sure you have the following installed:
 
 - [Python 3.8+](https://www.python.org/downloads/)
+- [pipenv](https://pypi.org/project/pipenv/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [tenv](https://github.com/tofuutils/tenv) – A CLI tool to easily install and manage versions of:
   - [Terraform](https://developer.hashicorp.com/terraform)
   - [Terragrunt](https://terragrunt.gruntwork.io/)
   - [OpenTofu (optional, but recommended)](https://opentofu.org/)
-- [dbt CLI](https://docs.getdbt.com/docs/core/cli/installation)
+- [dbt CLI](https://docs.getdbt.com/) - this will be installed via `pipenv` in one of the next steps
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
 
-> 🧭 **Region:** This project is configured for the `eu-central-1` region by default.  
-> 🏗️ **Environment:** All Terraform modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
+🧭 **Region:** This project is configured for the `eu-central-1` region by default.
+🏗️ **Environment:** All Terraform modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
 
 ---
 
@@ -40,21 +41,21 @@ Make sure you have the following installed:
 
 This project provisions the following infrastructure using Terraform + Terragrunt:
 
-- **VPC with Public & Private Subnets**  
+- **VPC with Public & Private Subnets**
   - Provides network isolation and control over traffic routing.
 
-- **NAT Gateway + VPC Endpoints**  
+- **NAT Gateway + VPC Endpoints**
   - Ensures secure, private connectivity to AWS services (Glue, S3, Secrets Manager, etc.) from private subnets.
 
-- **Aurora PostgreSQL Cluster**  
+- **Aurora PostgreSQL Cluster**
   - Acts as the operational source database for ingestion.
 
-- **S3 Buckets**  
+- **S3 Buckets**
   - Iceberg table storage
   - Athena query results
   - Glue ETL scripts
 
-- **AWS Glue Jobs**  
+- **AWS Glue Jobs**
   - Responsible for transforming and exporting data from Aurora to Iceberg tables.
   - Glue version: `4.0`
   - Worker type: `G.1X`
@@ -62,10 +63,10 @@ This project provisions the following infrastructure using Terraform + Terragrun
   - Script stored in S3
   - Integrated with Secrets Manager and Data Catalog
 
-- **Glue Data Catalog**  
+- **Glue Data Catalog**
   - Configured to manage Apache Iceberg tables (partitioned, versioned, and incremental).
 
-- **IAM Roles and Policies**  
+- **IAM Roles and Policies**
   - Fine-grained access for Glue, S3, Secrets Manager, and other services.
 
 ---
@@ -81,11 +82,12 @@ terragrunt apply
 
 ---
 ### 💾 State Management & Best Practices
-- Terraform State: 
+- Terraform State:
   - Stored remotely using S3 and DynamoDB to enable team collaboration and avoid state conflicts.
   (You can customize this if you use a different backend setup.)
 - Cost Control Tips:
   - Services like AWS Glue, Aurora, and NAT Gateway can be costly.
+  E.g. notice that VPC Endpoints in `terraform/vpc.tf` are commented out to destroy them when not used, to save costs.
   - Use Aurora Serverless v2, minimal worker types for Glue, and enable auto-pause where possible.
   - Clean up dev/test environments when idle to avoid unexpected charges.
 - Infrastructure Change Workflow:
@@ -111,13 +113,13 @@ This project uses **AWS Glue** and **Apache Iceberg** to extract data from an **
 
 ### 📦 ETL Flow Summary
 
-1. **Extract**:  
+1. **Extract**:
    AWS Glue connects to the Aurora PostgreSQL instance using JDBC. Secrets are securely retrieved from AWS Secrets Manager.
 
-2. **Transform**:  
+2. **Transform**:
    Glue reads data using Spark and applies any lightweight transformations if needed.
 
-3. **Load**:  
+3. **Load**:
    Data is written into Iceberg tables stored in S3, with metadata tracked in the AWS Glue Data Catalog.
 
 ---
@@ -130,10 +132,12 @@ Once your infrastructure and source DB are set up, you can trigger the ETL job m
 aws glue start-job-run --job-name northwind-iceberg-aurora-to-s3-etl-dev
 ```
 
+Remember to use the AWS CLI profile that has access to the Glue job and S3 bucket.
+
 ---
 ## 🧱 Data Modeling with dbt & Data Vault 2.0
 
-Once raw data from Aurora is loaded into S3 Iceberg tables, we use **dbt** to transform it into a well-modeled Data Vault structure.
+Once raw data from Aurora is loaded into S3 Iceberg tables, **dbt** is used to transform it into a well-modeled Data Vault structure.
 
 ### 📐 Data Vault Components
 
@@ -159,13 +163,36 @@ This project uses standard Data Vault layers:
 - **Incremental materializations** – Improve performance and reduce cost by only processing new or changed records.
 - **Hashdiff tracking in satellites** – Enables Slowly Changing Dimension (SCD) Type 2 behavior by tracking historical changes.
 - **Surrogate keys** – Simplify joins, enable deduplication, and enforce uniqueness across hubs, links, and satellites.
-- **Partitioning by date in Iceberg** – Automatically handled through dbt + Glue, optimizing query performance and storage.
+
+### 🧠️ Data Vault Features To Be Implemented
+- **Partitioning in Iceberg** – For optimizing query performance and storage.
 
 ---
 ### 📊 Data Vault Model Diagram
 ![data_vault_structure.png](assets/data_vault_structure.png)
 ---
 ### 🧪 Running dbt
+Before running dbt, ensure you have Python dependencies installed. Use the `pipenv` environment to manage Python packages:
+```bash
+cd root_repo_directory
+pipenv install
+```
+Then, set up your dbt profile. Update the `.dbt/profile.yml` file with the following content:
+
+```yaml
+your_profile_name:
+  target: dev
+  outputs:
+    dev:
+      type: athena
+      threads: 1
+      region_name: eu-central-1
+      s3_staging_dir: s3://your-athena-query-results-bucket/
+      database: your_database_name
+      schema: iceberg
+      work_group: primary
+      profile_name: aws_cli_profile_name
+```
 
 Install dbt dependencies and run the models:
 
@@ -220,5 +247,3 @@ Here's what could be explored next:
 - [ ] **Bridge Tables** for many-to-many relationships (e.g. products in orders)
 - [ ] **Data Marts** built on top of the vault (star schema views)
 - [ ] **Automated data loading** into Aurora via CDC or batch ingestion
-- [ ] **dbt CI/CD pipeline** to run tests and preview docs on pull requests
-- [ ] **Support for multiple environments** (dev, staging, prod)

@@ -15,16 +15,16 @@ variable "bucket" {
 }
 
 variable "raw_data_directory" {
-    description = "The directory in the S3 bucket where the raw data is stored"
+  description = "The directory in the S3 bucket where the raw data is stored"
 }
 
 variable "aurora_credentials_secret_arn" {
-    description = "The secret containing the Aurora credentials"
+  description = "The secret containing the Aurora credentials"
 }
 
 variable "aws_account_id" {
   description = "The AWS account ID"
-  default = "926728314305"
+  default     = "926728314305"
 }
 
 variable "glue_sg" {
@@ -32,6 +32,6 @@ variable "glue_sg" {
 }
 
 variable "debug" {
-    description = "Enable debug mode"
-    default = "false"
+  description = "Enable debug mode"
+  default     = "false"
 }

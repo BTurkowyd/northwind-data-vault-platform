@@ -6,9 +6,14 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_suppliers') }}
 ),
+
 hub_keys AS (
-    SELECT supplier_id, hub_supplier_key FROM {{ ref('hub_suppliers') }}
+    SELECT
+        supplier_id,
+        hub_supplier_key
+    FROM {{ ref('hub_suppliers') }}
 ),
+
 prepared AS (
     SELECT
         sd.*,
@@ -18,8 +23,8 @@ prepared AS (
             'sd.city', 'sd.region', 'sd.postal_code', 'sd.country',
             'sd.phone', 'sd.fax', 'sd.homepage'
         ]) }} AS hashdiff
-    FROM source_data sd
-    JOIN hub_keys hk ON sd.supplier_id = hk.supplier_id
+    FROM source_data AS sd
+    INNER JOIN hub_keys AS hk ON sd.supplier_id = hk.supplier_id
 )
 
 SELECT
@@ -37,7 +42,7 @@ SELECT
     fax,
     homepage,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM prepared
 

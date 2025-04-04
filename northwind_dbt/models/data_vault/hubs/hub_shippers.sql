@@ -6,7 +6,7 @@
 SELECT
     {{ dbt_utils.generate_surrogate_key(['shipper_id']) }} AS hub_shipper_key,
     shipper_id,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM {{ ref('stg_shippers') }}
 

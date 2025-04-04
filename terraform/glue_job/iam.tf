@@ -34,7 +34,7 @@ resource "aws_iam_policy_attachment" "glue_rds_access" {
 }
 
 resource "aws_iam_policy" "glue_get_connection_policy" {
-  name = "glue_get_connection_policy_${var.raw_data_directory}_${var.stage}"
+  name        = "glue_get_connection_policy_${var.raw_data_directory}_${var.stage}"
   description = "Allows AWS Glue to retrieve Glue Connections"
 
   policy = jsonencode({
@@ -73,7 +73,7 @@ resource "aws_iam_policy_attachment" "glue_logging" {
 }
 
 resource "aws_iam_policy" "glue_secretsmanager_policy" {
-  name = "glue_secretsmanager_policy_${var.raw_data_directory}_${var.stage}"
+  name        = "glue_secretsmanager_policy_${var.raw_data_directory}_${var.stage}"
   description = "Allows AWS Glue to retrieve credentials from Secrets Manager"
 
   policy = jsonencode({
@@ -97,7 +97,7 @@ resource "aws_iam_role_policy_attachment" "glue_secretsmanager_attachment" {
 }
 
 resource "aws_iam_policy" "glue_vpc_access" {
-  name = "glue_vpc_access_${var.raw_data_directory}_${var.stage}"
+  name        = "glue_vpc_access_${var.raw_data_directory}_${var.stage}"
   description = "Allows Glue to access resources in a VPC"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -133,8 +133,8 @@ resource "aws_iam_policy" "get_caller_identity_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "sts:GetCallerIdentity"
+        Effect   = "Allow"
+        Action   = "sts:GetCallerIdentity"
         Resource = "*"
       }
     ]

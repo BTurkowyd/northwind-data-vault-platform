@@ -6,9 +6,14 @@
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_orders') }}
 ),
+
 hub_orders AS (
-    SELECT order_id, hub_order_key FROM {{ ref('hub_orders') }}
+    SELECT
+        order_id,
+        hub_order_key
+    FROM {{ ref('hub_orders') }}
 ),
+
 prepared AS (
     SELECT
         sd.*,
@@ -26,8 +31,8 @@ prepared AS (
             'sd.ship_postal_code',
             'sd.ship_country'
         ]) }} AS hashdiff
-    FROM source_data sd
-    JOIN hub_orders ho ON sd.order_id = ho.order_id
+    FROM source_data AS sd
+    INNER JOIN hub_orders AS ho ON sd.order_id = ho.order_id
 )
 
 SELECT
@@ -45,7 +50,7 @@ SELECT
     ship_postal_code,
     ship_country,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp(6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
     record_source
 FROM prepared
 

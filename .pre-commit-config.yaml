@@ -1,0 +1,54 @@
+repos:
+  # Basic formatting checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: check-json
+
+  # Python formatter (e.g., Glue ETL scripts)
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  # Tofu (Terraform fork) formatting via shell hooks
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.84.0
+    hooks:
+      - id: terraform_fmt
+        name: tofu_fmt
+        entry: tofu fmt -recursive
+        language: system
+        files: \.tf$
+      - id: terraform_validate
+        name: tofu_validate
+        entry: bash -c 'tofu validate || exit 1'
+        language: system
+        files: \.tf$
+
+  # SQLFluff for dbt/Athena
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.3.1
+    hooks:
+      - id: sqlfluff-lint
+        args: ["--config=.sqlfluff", "--processes=1"]
+        additional_dependencies:
+          - sqlfluff-templater-dbt==3.3.1
+          - dbt-core==1.9.2
+          - dbt-athena-community==1.9.2
+        files: ^northwind_dbt/
+      - id: sqlfluff-fix
+        args: ["--config=.sqlfluff", "--processes=1"]
+        additional_dependencies:
+          - sqlfluff-templater-dbt==3.3.1
+          - dbt-core==1.9.2
+          - dbt-athena-community==1.9.2
+        files: ^northwind_dbt/
+
+default_stages: [commit]
+exclude: ^(\.sqlfluff|\.dbt)/.*
