@@ -27,7 +27,5 @@ models:
   northwind_dbt:
     +table_type: iceberg
     +format: parquet
-    models:
-      data_vault:
-        +materialized: incremental
-        +incremental_strategy: merge
+    +materialized: incremental
+    +incremental_strategy: merge
