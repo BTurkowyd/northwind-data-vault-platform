@@ -32,7 +32,7 @@ SELECT
     hp.hub_product_key,
     hs.hub_supplier_key,
     hc.hub_category_key,
-    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
     sd.record_source
 FROM source_data AS sd
 INNER JOIN hub_products AS hp ON sd.product_id = hp.product_id

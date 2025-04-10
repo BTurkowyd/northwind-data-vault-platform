@@ -27,7 +27,7 @@ SELECT
     p.customer_desc,
     p.hashdiff,
     p.record_source,
-    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts
+    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts
 FROM prepared AS p
 INNER JOIN hub_keys AS hk ON p.customer_type_id = hk.customer_type_id
 

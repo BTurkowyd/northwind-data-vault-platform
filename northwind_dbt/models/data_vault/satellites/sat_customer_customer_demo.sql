@@ -18,7 +18,7 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(['hk.hub_customer_key', 'sd.record_source']) }} AS sat_customer_key,
     hk.hub_customer_key,
     {{ dbt_utils.generate_surrogate_key(['sd.record_source']) }} AS hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
     sd.record_source
 FROM source_data AS sd
 INNER JOIN hub_keys AS hk ON sd.customer_id = hk.customer_id

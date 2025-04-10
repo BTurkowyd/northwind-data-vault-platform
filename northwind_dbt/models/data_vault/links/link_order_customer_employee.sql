@@ -32,7 +32,7 @@ SELECT
     ho.hub_order_key,
     hc.hub_customer_key,
     he.hub_employee_key,
-    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
     sd.record_source
 FROM source_data AS sd
 INNER JOIN hub_orders AS ho ON sd.order_id = ho.order_id
