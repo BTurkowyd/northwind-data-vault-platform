@@ -42,7 +42,7 @@ SELECT
     fax,
     homepage,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
     record_source
 FROM prepared
 

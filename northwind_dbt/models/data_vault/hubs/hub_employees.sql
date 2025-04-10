@@ -5,7 +5,7 @@
 SELECT
     {{ dbt_utils.generate_surrogate_key(['employee_id']) }} AS hub_employee_key,
     employee_id,
-    CAST(CURRENT_TIMESTAMP AS timestamp (6) with time zone) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
     record_source
 FROM {{ ref('stg_employees') }}
 

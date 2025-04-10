@@ -16,19 +16,12 @@ generate "versions" {
           source = "hashicorp/aws"
           version = ">= 5.91.0"
         }
+        snowflake = {
+          source  = "Snowflake-Labs/snowflake"
+          version = "1.0.5"
+        }
       }
     }
-  EOT
-}
-
-generate "provider" {
-  path = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-    contents = <<-EOT
-      provider "aws" {
-        region = "${local.region}"
-        profile = "${local.profile}"
-      }
   EOT
 }
 
