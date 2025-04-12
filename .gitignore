@@ -1,9 +1,5 @@
-/terragrunt/dev/aws/terragrunt.hcl
-/terragrunt/dev/snowflake_provider.hcl
 .env
-/terragrunt/dev/aws/.terragrunt-cache/
-/terragrunt/dev/aws/.terraform.lock.hcl
-/terragrunt/dev/snowflake/.terragrunt-cache/
-/terragrunt/dev/snowflake/.terraform.lock.hcl
+**/.terragrunt-cache/
+**/.terraform.lock.hcl
 /.venv/
 /logs/
