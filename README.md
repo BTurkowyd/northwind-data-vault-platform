@@ -5,6 +5,7 @@ This project builds a modern, scalable data warehouse architecture using:
 - AWS Aurora Serverless for transactional data storage as the source system
 - AWS Glue & Iceberg for robust, ACID-compliant data lake storage
 - dbt for implementing Data Vault 2.0 modeling
+- Snowflake for data warehousing and analytics
 - Amazon Athena as the query engine
 - Terraform for infrastructure provisioning
 
@@ -31,6 +32,7 @@ Make sure you have the following installed:
   - [OpenTofu (optional, but recommended)](https://opentofu.org/)
 - [dbt CLI](https://docs.getdbt.com/) - this will be installed via `pipenv` in one of the next steps
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
+- A working Snowflake account (for data warehousing)
 
 🧭 **Region:** This project is configured for the `eu-central-1` region by default.
 🏗️ **Environment:** All Terraform modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
@@ -41,6 +43,7 @@ Make sure you have the following installed:
 
 This project provisions the following infrastructure using Terraform + Terragrunt:
 
+#### AWS
 - **VPC with Public & Private Subnets**
   - Provides network isolation and control over traffic routing.
 
@@ -69,15 +72,28 @@ This project provisions the following infrastructure using Terraform + Terragrun
 - **IAM Roles and Policies**
   - Fine-grained access for Glue, S3, Secrets Manager, and other services.
 
+#### Snowflake
+- **Snowflake Database**
+  - Data warehouse for analytics and reporting.
+- **Snowflake Warehouse**
+  - Compute resources for running queries.
+- **Snowflake Roles and Permissions**
+  - Roles for data ingestion, transformation, and querying.
+
 ---
 
 ### 🚀 Deploying the Infrastructure
 
-To spin up the infrastructure, navigate to the appropriate environment folder (e.g., `terragrunt/dev`) and run:
-
+To spin up the infrastructure, use the commands from the Makefile in the root directory of the repository:
 ```bash
-terragrunt init
-terragrunt apply
+
+make aws-init
+make aws-plan
+make aws-apply
+
+make snowflake-init
+make snowflake-plan
+make snowflake-apply
 ```
 
 ---
@@ -91,7 +107,7 @@ terragrunt apply
   - Use Aurora Serverless v2, minimal worker types for Glue, and enable auto-pause where possible.
   - Clean up dev/test environments when idle to avoid unexpected charges.
 - Infrastructure Change Workflow:
-  - Always preview changes before applying `terragrunt plan`.
+  - Always preview changes before applying `aws-plan|snowflake-plan`.
 
 ---
 ## Loading Data into Aurora PostgreSQL
