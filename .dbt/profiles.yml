@@ -9,3 +9,17 @@ northwind_dbt:
       schema: northwind_data_vault
       work_group: primary
       profile_name: cdk-dev
+
+snowflake_profile:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      authenticator: snowflake_jwt
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      database: NORTHWIND_DB
+      warehouse: NORTHWIND_WH
+      schema: NORTHWIND_SCHEMA
