@@ -1,8 +1,14 @@
 # import env variables from .env file
 include .env
-export $(grep -v '^#' .env | xargs)
 
-# git commit and push, with message
-commit_push:
-	@git commit -m "$(MESSAGE)"
-	@git push
+aws-plan:
+	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt plan
+
+snowflake-plan:
+	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt plan
+
+aws-apply:
+	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt apply
+
+snowflake-apply:
+	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt apply
