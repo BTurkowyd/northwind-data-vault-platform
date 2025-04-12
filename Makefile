@@ -1,29 +1,14 @@
-# Install python venv in .venv. Install dbt, dbt-athena-community, dbt-utils in venv.
-setup-data-vault:
-	python3. -m venv .venv
-	. .venv/bin/activate && pip install dbt dbt-athena-community dbt-utils
+# import env variables from .env file
+include .env
 
-# Run dbt default run.
-dbt-run:
-	@if [ -z "$(PROJECT_DIR)" ]; then \
-		echo "Error: PROJECT_DIR variable is required. Usage: make dbt-run PROJECT_DIR=project_dir"; \
-		exit 1; \
-	fi
-	. .venv/bin/activate && dbt run --project-dir $(PROJECT_DIR)
+aws-plan:
+	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt plan
 
-# Run dbt full refresh
-dbt-run-full-refresh:
-	@if [ -z "$(PROJECT_DIR)" ]; then \
-		echo "Error: PROJECT_DIR variable is required. Usage: make dbt-run-full-refresh PROJECT_DIR=project_dir"; \
-		exit 1; \
-	fi
-	. .venv/bin/activate && dbt run --full-refresh --project-dir $(PROJECT_DIR)
+snowflake-plan:
+	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt plan
 
-# Generate and serve dbt documentation
-dbt-documentation:
-	@if [ -z "$(PROJECT_DIR)" ]; then \
-		echo "Error: PROJECT_DIR variable is required. Usage: make dbt-documentation PROJECT_DIR=project_dir"; \
-		exit 1; \
-	fi
-	. .venv/bin/activate && dbt docs generate --project-dir $(PROJECT_DIR)
-	. .venv/bin/activate && dbt docs serve --project-dir $(PROJECT_DIR)
+aws-apply:
+	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt apply
+
+snowflake-apply:
+	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt apply
