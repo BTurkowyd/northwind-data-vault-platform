@@ -28,10 +28,10 @@ SELECT
     hub_region_key,
     region_description,
     hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6)) AS load_ts,
     record_source
 FROM prepared
 
 {% if is_incremental() %}
-WHERE hashdiff NOT IN (SELECT hashdiff FROM {{ this }})
+    WHERE hashdiff NOT IN (SELECT hashdiff FROM {{ this }})
 {% endif %}

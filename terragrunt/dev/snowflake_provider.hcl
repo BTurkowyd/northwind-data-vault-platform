@@ -17,6 +17,7 @@ generate "snowflake_provider" {
       role              = "${local.snowflake_role}"
       authenticator     = "SNOWFLAKE_JWT"
       private_key       = file("${local.snowflake_privatekey}")
+      preview_features_enabled = ["snowflake_storage_integration_resource"]
     }
   EOT
 }

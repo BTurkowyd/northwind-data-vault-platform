@@ -24,7 +24,7 @@ SELECT
     sd.picture,
     sd.record_source,
     sd.hashdiff,
-    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts
+    CAST(CURRENT_TIMESTAMP AS timestamp (6)) AS load_ts
 FROM (
     -- The source data with hashdiff
     SELECT
@@ -36,5 +36,5 @@ FROM (
 INNER JOIN hub_keys AS hk ON sd.category_id = hk.category_id
 
 {% if is_incremental() %}
-WHERE sd.hashdiff NOT IN (SELECT hashdiff FROM {{ this }})
+    WHERE sd.hashdiff NOT IN (SELECT hashdiff FROM {{ this }})
 {% endif %}
