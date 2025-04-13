@@ -1,0 +1,25 @@
+northwind_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: athena
+      s3_staging_dir: "{{ env_var('ATHENA_STAGING_DIR') }}"
+      region_name: eu-central-1
+      database: awsdatacatalog
+      schema: northwind_data_vault
+      work_group: primary
+      profile_name: cdk-dev
+
+snowflake_profile:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ORGANIZATION_NAME') }}-{{ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      authenticator: snowflake_jwt
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      database: NORTHWIND_DB_DEV
+      warehouse: NORTHWIND_WH_DEV
+      schema: NORTHWIND_SCHEMA_DEV

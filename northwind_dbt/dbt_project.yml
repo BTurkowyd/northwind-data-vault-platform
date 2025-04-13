@@ -24,10 +24,14 @@ vars:
   record_source: "aurora-postgres"
 
 models:
-  data_vault:
-    +table_type: iceberg
-    +format: parquet
-    +materialized: incremental
-    +incremental_strategy: merge
-  staging:
-    +materialized: view
+  northwind_dbt:
+    staging:
+      +materialized: view
+    data_vault:
+      +materialized: incremental
+      +table_type: iceberg
+      +format: parquet
+      +incremental_strategy: merge
+      hubs: {}
+      satellites: {}
+      links: {}

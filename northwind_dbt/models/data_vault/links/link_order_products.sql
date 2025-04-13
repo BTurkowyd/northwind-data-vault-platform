@@ -24,13 +24,14 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(['ho.hub_order_key', 'hp.hub_product_key']) }} AS link_order_product_key,
     ho.hub_order_key,
     hp.hub_product_key,
-    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6)) AS load_ts,
     sd.record_source
 FROM source_data AS sd
 INNER JOIN hub_orders AS ho ON sd.order_id = ho.order_id
 INNER JOIN hub_products AS hp ON sd.product_id = hp.product_id
 
 {% if is_incremental() %}
-WHERE {{ dbt_utils.generate_surrogate_key(['ho.hub_order_key', 'hp.hub_product_key']) }}
-  NOT IN (SELECT link_order_product_key FROM {{ this }})
+    WHERE
+        {{ dbt_utils.generate_surrogate_key(['ho.hub_order_key', 'hp.hub_product_key']) }}
+        NOT IN (SELECT link_order_product_key FROM {{ this }})
 {% endif %}

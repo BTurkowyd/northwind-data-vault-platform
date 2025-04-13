@@ -1,6 +1,6 @@
 
 resource "snowflake_account_role" "northwind_owner" {
-  name    = "NORTHWIND_OWNER"
+  name    = "NORTHWIND_OWNER_${var.stage}"
   comment = "Role to manage NORTHWIND_DB"
 }
 

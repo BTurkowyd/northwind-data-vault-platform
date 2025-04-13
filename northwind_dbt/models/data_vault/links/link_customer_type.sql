@@ -25,13 +25,14 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(['hc.hub_customer_key', 'hct.hub_customer_type_key']) }} AS link_customer_type_key,
     hc.hub_customer_key,
     hct.hub_customer_type_key,
-    CAST(CURRENT_TIMESTAMP AS timestamp) AS load_ts,
+    CAST(CURRENT_TIMESTAMP AS timestamp (6)) AS load_ts,
     sd.record_source
 FROM source_data AS sd
 INNER JOIN hub_customers AS hc ON sd.customer_id = hc.customer_id
 INNER JOIN hub_customer_types AS hct ON sd.customer_type_id = hct.customer_type_id
 
 {% if is_incremental() %}
-WHERE {{ dbt_utils.generate_surrogate_key(['hc.hub_customer_key', 'hct.hub_customer_type_key']) }}
-  NOT IN (SELECT link_customer_type_key FROM {{ this }})
+    WHERE
+        {{ dbt_utils.generate_surrogate_key(['hc.hub_customer_key', 'hct.hub_customer_type_key']) }}
+        NOT IN (SELECT link_customer_type_key FROM {{ this }})
 {% endif %}
