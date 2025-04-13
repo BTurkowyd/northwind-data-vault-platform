@@ -11,10 +11,24 @@
       {% set stage_path = table_name %}
       {% set location = '@S3_STAGE_DEV/' ~ stage_path %}
 
-      {{ log("Creating external table: " ~ full_table_name ~ " from stage path: @S3_STAGE_DEV/" ~ stage_path, info=True) }}
+      {# Construct column definitions: name TYPE AS (VALUE:"col") #}
+      {% set column_definitions = [] %}
+      {% for col_name, col in node['columns'].items() %}
+        {% set col_type = col['type'] | upper %}
+        {% if col_name == 'load_ts' %}
+          {% do column_definitions.append(col_name ~ ' TIMESTAMP AS (TO_TIMESTAMP((VALUE:"' ~ col_name ~ '"::NUMBER) / 1000000))') %}
+        {% else %}
+          {% do column_definitions.append(col_name ~ ' ' ~ col_type ~ ' AS (VALUE:"' ~ col_name ~ '"::' ~ col_type ~ ')') %}
+        {% endif %}
+      {% endfor %}
 
+      {{ log("Creating external table: " ~ full_table_name ~ " with columns:\n" ~ column_definitions | join(',\n'), info=True) }}
+
+      {# Build the query with virtual columns #}
       {% set query %}
-        CREATE OR REPLACE EXTERNAL TABLE {{ full_table_name }}
+        CREATE OR REPLACE EXTERNAL TABLE {{ full_table_name }} (
+          {{ column_definitions | join(',\n  ') }}
+        )
         LOCATION = {{ location }}
         AUTO_REFRESH = FALSE
         FILE_FORMAT = (TYPE = PARQUET);

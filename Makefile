@@ -1,33 +1,43 @@
-# import env variables from .env file
-include .env
+# Load environment variables
+ENV = set -a && . .env && set +a
 
+# Paths
+AWS_DIR = terragrunt/dev/aws
+SNOWFLAKE_DIR = terragrunt/dev/snowflake
+DBT_DIR = northwind_dbt
+CATALOG_JSON = $(DBT_DIR)/target/catalog.json
+
+# Helper for Terragrunt commands
+define TG_CMD
+	$(ENV) && cd $1 && terragrunt $2
+endef
+
+# AWS
 aws-init:
-	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt init
+	$(call TG_CMD, $(AWS_DIR), init)
 
 aws-plan:
-	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt plan
+	$(call TG_CMD, $(AWS_DIR), plan)
 
 aws-apply:
-	set -a && . .env && set +a && cd terragrunt/dev/aws && terragrunt apply
+	$(call TG_CMD, $(AWS_DIR), apply)
 
 aws-dbt:
-	set -a && . .env && set +a && cd northwind_dbt && dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt
+	$(ENV) && cd $(DBT_DIR) && dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
-
+# Snowflake
 snowflake-init:
-	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt init
+	$(call TG_CMD, $(SNOWFLAKE_DIR), init)
 
 snowflake-plan:
-	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt plan
+	$(call TG_CMD, $(SNOWFLAKE_DIR), plan)
 
 snowflake-apply:
-	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt apply
+	$(call TG_CMD, $(SNOWFLAKE_DIR), apply)
 
 snowflake-dbt:
-	set -a && \
-	. .env && \
-	DBT_JSON_CATALOG="$$(< /Users/bartoszturkowyd/Projects/dbt-data-vault/northwind_dbt/target/catalog.json)" && \
+	$(ENV) && \
+	DBT_JSON_CATALOG="$$(< $(CATALOG_JSON))" && \
 	export DBT_JSON_CATALOG && \
-	set +a && \
-	cd northwind_dbt \
-	&& dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt
+	cd $(DBT_DIR) && \
+	dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt
