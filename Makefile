@@ -24,4 +24,10 @@ snowflake-apply:
 	set -a && . .env && set +a && cd terragrunt/dev/snowflake && terragrunt apply
 
 snowflake-dbt:
-	set -a && . .env && set +a && cd northwind_dbt && dbt run-operation snowflake_create_all_external_tables --profile snowflake_profile --target dev --profiles-dir ./.dbt
+	set -a && \
+	. .env && \
+	DBT_JSON_CATALOG="$$(< /Users/bartoszturkowyd/Projects/dbt-data-vault/northwind_dbt/target/catalog.json)" && \
+	export DBT_JSON_CATALOG && \
+	set +a && \
+	cd northwind_dbt \
+	&& dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt
