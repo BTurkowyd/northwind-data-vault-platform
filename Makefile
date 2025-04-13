@@ -23,7 +23,8 @@ aws-apply:
 	$(call TG_CMD, $(AWS_DIR), apply)
 
 aws-dbt:
-	$(ENV) && cd $(DBT_DIR) && dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt
+	$(ENV) && cd $(DBT_DIR) && dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
+	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
 # Snowflake
 snowflake-init:
