@@ -15,11 +15,11 @@ snowflake_profile:
   outputs:
     dev:
       type: snowflake
-      account: "{{ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
+      account: "{{ env_var('SNOWFLAKE_ORGANIZATION_NAME') }}-{{ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       authenticator: snowflake_jwt
       private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
-      database: NORTHWIND_DB
-      warehouse: NORTHWIND_WH
-      schema: NORTHWIND_SCHEMA
+      database: NORTHWIND_DB_DEV
+      warehouse: NORTHWIND_WH_DEV
+      schema: NORTHWIND_SCHEMA_DEV
