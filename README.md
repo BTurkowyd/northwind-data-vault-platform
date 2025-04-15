@@ -14,7 +14,7 @@ and historical tracking using open standards and managed AWS services.
 
 ---
 ## Architecture Overview
-![architecture_overview.png](assets/architecture_overview.png)
+![architecture_overview.png](assets/data_infrastructure_-_logical_flow.png)
 
 ---
 ## 🔧 Infrastructure Setup and Tools
@@ -151,9 +151,11 @@ aws glue start-job-run --job-name northwind-iceberg-aurora-to-s3-etl-dev
 Remember to use the AWS CLI profile that has access to the Glue job and S3 bucket.
 
 ---
-## 🧱 Data Modeling with dbt & Data Vault 2.0
+## 🧱 Data Modeling with dbt:  Data Vault 2.0 and Marts
 
-Once raw data from Aurora is loaded into S3 Iceberg tables, **dbt** is used to transform it into a well-modeled Data Vault structure.
+Once raw data from Aurora is loaded into S3 Iceberg tables, **dbt** is used to transform it into a well-modeled Data Vault structure
+and creates marts afterward. While `marts` are not part of the Data Vault, they are built on top of it for analytical purposes,
+thus for the sake of this project, they are included in the same dbt project and included in this section.
 
 ### 📐 Data Vault Components
 
@@ -170,8 +172,7 @@ This project uses standard Data Vault layers:
 - **`models/data_vault/hub_*.sql`**: Hubs with business keys and surrogate keys
 - **`models/data_vault/link_*.sql`**: Links joining two or more hubs
 - **`models/data_vault/sat_*.sql`**: Satellites with historical attributes and hashdiffs
-
-`dbt_utils.generate_surrogate_key()` is used for consistency in hash-based keys and change detection.
+- **`models/marts/`**: Data marts built on top of the vault
 
 ---
 ### 🧠 Data Vault Features Implemented
@@ -179,6 +180,8 @@ This project uses standard Data Vault layers:
 - **Incremental materializations** – Improve performance and reduce cost by only processing new or changed records.
 - **Hashdiff tracking in satellites** – Enables Slowly Changing Dimension (SCD) Type 2 behavior by tracking historical changes.
 - **Surrogate keys** – Simplify joins, enable deduplication, and enforce uniqueness across hubs, links, and satellites.
+
+`dbt_utils.generate_surrogate_key()` is used for consistency in hash-based keys and change detection.
 
 ### 🧠️ Data Vault Features To Be Implemented
 - **Partitioning in Iceberg** – For optimizing query performance and storage.
@@ -193,21 +196,34 @@ Before running dbt, ensure you have Python dependencies installed. Use the `pipe
 cd root_repo_directory
 pipenv install
 ```
-Then, set up your dbt profile. Update the `.dbt/profile.yml` file with the following content:
+Then, set up your dbt profile. Update the `./northwind_dbt/dbt/profile.yml` file with the following content:
 
 ```yaml
-your_profile_name:
+dbt_aws_profile:
   target: dev
   outputs:
     dev:
       type: athena
-      threads: 1
+      s3_staging_dir: "{{ env_var('ATHENA_STAGING_DIR') }}"
       region_name: eu-central-1
-      s3_staging_dir: s3://your-athena-query-results-bucket/
-      database: your_database_name
-      schema: iceberg
+      database: awsdatacatalog # can be any name, but must match the Glue Data Catalog database
+      schema: northwind_data_vault
       work_group: primary
-      profile_name: aws_cli_profile_name
+      profile_name: aws_iam_user_name
+
+dbt_snowflake_profile:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ORGANIZATION_NAME') }}-{{ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      authenticator: snowflake_jwt
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      database: NORTHWIND_DB_DEV
+      warehouse: NORTHWIND_WH_DEV
+      schema: NORTHWIND_SCHEMA_DEV
 ```
 
 Install dbt dependencies and run the models:
@@ -220,6 +236,13 @@ dbt run --full-refresh   # full rebuild (use carefully)
 dbt docs generate        # generate documentation
 dbt docs serve           # view documentation
 ```
+
+For the convenience of running dbt commands, you can use the Makefile in the root directory:
+```bash
+make aws-dbt # runs dbt on AWS Athena to build the models (data vault and marts)
+make snowflake-dbt # migrates marts to Snowflake (creates external and materialized tables)
+```
+
 
 ---
 ## Future Enhancements & Roadmap
