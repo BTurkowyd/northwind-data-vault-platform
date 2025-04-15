@@ -1,0 +1,51 @@
+{{ config(materialized='incremental', unique_key='link_order_product_key') }}
+
+with order_lines as (
+
+    select
+        l.link_order_product_key,
+        l.hub_order_key,
+        l.hub_product_key,
+        p.unit_price,
+        p.quantity,
+        p.discount,
+        p.unit_price * p.quantity * (1 - p.discount) as revenue,
+        p.load_ts as line_load_ts
+    from {{ ref('link_order_products') }} l
+    join {{ ref('sat_order_products') }} p
+        on l.link_order_product_key = p.link_order_product_key
+
+),
+
+orders as (
+    select
+        o.hub_order_key,
+        o.order_date,
+        o.ship_country,
+        o.freight
+    from {{ ref('sat_orders') }} o
+),
+
+country_year_sales as (
+    select
+        ol.link_order_product_key,
+        ol.hub_order_key,
+        ol.hub_product_key,
+        o.order_date,
+        o.ship_country,
+        ol.revenue,
+        o.freight,
+        ol.line_load_ts
+    from order_lines ol
+    left join orders o
+        on ol.hub_order_key = o.hub_order_key
+)
+
+select
+    ship_country,
+    date_trunc('year', order_date) as year,
+    sum(revenue) as total_revenue,
+    sum(freight) as total_freight,
+    count(distinct hub_order_key) as order_count
+from country_year_sales
+group by 1, 2
