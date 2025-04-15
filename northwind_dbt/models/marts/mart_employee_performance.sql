@@ -23,7 +23,7 @@ sales as (
 aggregated as (
     select
         hub_employee_key,
-        sum(revenue) as total_revenue,
+        CAST(ROUND(sum(revenue), 2) AS DECIMAL(10,2)) as total_revenue,
         count(*) as total_lines
     from sales
     group by hub_employee_key

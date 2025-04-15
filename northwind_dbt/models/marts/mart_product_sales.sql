@@ -39,7 +39,7 @@ product_lines as (
 aggregated as (
     select
         hub_product_key,
-        sum(revenue) as total_revenue,
+        CAST(ROUND(sum(revenue), 2) AS DECIMAL(10,2)) as total_revenue,
         count(*) as total_orders,
         sum(quantity) as total_quantity
     from product_lines

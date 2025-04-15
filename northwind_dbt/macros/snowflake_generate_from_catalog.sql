@@ -5,13 +5,18 @@
 
   {% for node_key, node in nodes.items() %}
     {% set metadata = node['metadata'] %}
-    {% if metadata['type'] == 'iceberg_table' %}
-      {% set table_name = metadata['name'] %}
-      {% set full_table_name = 'NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV.' ~ table_name %}
+    {% set table_name = metadata['name'] %}
+
+    {% if metadata['type'] == 'iceberg_table' and table_name.startswith('mart_') %}
+      {% set schema = 'NORTHWIND_SCHEMA_DEV' %}
+      {% set database = 'NORTHWIND_DB_DEV' %}
+      {% set full_table_name = database ~ '.' ~ schema ~ '.' ~ table_name %}
+      {% set external_table_name = full_table_name ~ '_external' %}
+      {% set materialized_table_name = full_table_name %}
       {% set stage_path = table_name %}
       {% set location = '@S3_STAGE_DEV/' ~ stage_path %}
 
-      {# Construct column definitions: name TYPE AS (VALUE:"col") #}
+      {# Column definitions #}
       {% set column_definitions = [] %}
       {% for col_name, col in node['columns'].items() %}
         {% set col_type = col['type'] | upper %}
@@ -22,11 +27,10 @@
         {% endif %}
       {% endfor %}
 
-      {{ log("Creating external table: " ~ full_table_name ~ " with columns:\n" ~ column_definitions | join(',\n'), info=True) }}
+      {{ log("Creating external table: " ~ external_table_name ~ " with columns:\n" ~ column_definitions | join(',\n'), info=True) }}
 
-      {# Build the query with virtual columns #}
-      {% set query %}
-        CREATE OR REPLACE EXTERNAL TABLE {{ full_table_name }} (
+      {% set create_external_table %}
+        CREATE OR REPLACE EXTERNAL TABLE {{ external_table_name }} (
           {{ column_definitions | join(',\n  ') }}
         )
         LOCATION = {{ location }}
@@ -34,7 +38,21 @@
         FILE_FORMAT = (TYPE = PARQUET);
       {% endset %}
 
-      {{ run_query(query.strip()) }}
+      {{ run_query(create_external_table.strip()) }}
+      {{ run_query('ALTER EXTERNAL TABLE ' ~ external_table_name ~ ' REFRESH') }}
+
+      {# Create materialized table from external one #}
+      {% set materialize_table %}
+        CREATE OR REPLACE TABLE {{ materialized_table_name }} AS
+        SELECT * FROM {{ external_table_name }};
+        ALTER TABLE {{ materialized_table_name }} DROP COLUMN value;
+      {% endset %}
+
+      {{ log("Materializing table: " ~ materialized_table_name, info=True) }}
+      {{ run_query(materialize_table.strip()) }}
+
+    {% else %}
+      {{ log("Skipping table: " ~ table_name, info=True) }}
     {% endif %}
   {% endfor %}
 {% endmacro %}
