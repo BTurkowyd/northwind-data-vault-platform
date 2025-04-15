@@ -45,7 +45,7 @@ sales as (
         oc.hub_customer_key,
         cd.company_name,
         cd.country,
-        p.unit_price * p.quantity * (1 - p.discount) as revenue,
+        cast(round(p.unit_price * p.quantity * (1 - p.discount), 2) as decimal(10,2))as revenue,
         p.load_ts
     from {{ ref('link_order_products') }} l
     join latest_sat_order_products p

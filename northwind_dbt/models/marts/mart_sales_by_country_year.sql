@@ -65,8 +65,8 @@ country_year_sales as (
 select
     ship_country,
     date_trunc('year', order_date) as year,
-    sum(revenue) as total_revenue,
-    sum(freight) as total_freight,
+    CAST(ROUND(sum(revenue), 2) AS DECIMAL(10,2)) as total_revenue,
+    CAST(ROUND(sum(freight), 2) AS DECIMAL(10,2)) as total_freight,
     count(distinct hub_order_key) as order_count
 from country_year_sales
 group by 1, 2

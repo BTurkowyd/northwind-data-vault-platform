@@ -60,7 +60,7 @@ final as (
         ol.unit_price,
         ol.quantity,
         ol.discount,
-        ol.revenue,
+        cast(round(ol.revenue, 2) as decimal(10,2)) as revenue,
         ol.line_load_ts,
         ol.line_record_source
     from order_lines ol

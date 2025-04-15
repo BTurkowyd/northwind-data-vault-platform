@@ -5,8 +5,9 @@
 
   {% for node_key, node in nodes.items() %}
     {% set metadata = node['metadata'] %}
-    {% if metadata['type'] == 'iceberg_table' %}
-      {% set table_name = metadata['name'] %}
+    {% set table_name = metadata['name'] %}
+
+    {% if metadata['type'] == 'iceberg_table' and table_name.startswith('mart_') %}
       {% set full_table_name = 'NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV.' ~ table_name %}
       {% set stage_path = table_name %}
       {% set location = '@S3_STAGE_DEV/' ~ stage_path %}
@@ -24,7 +25,6 @@
 
       {{ log("Creating external table: " ~ full_table_name ~ " with columns:\n" ~ column_definitions | join(',\n'), info=True) }}
 
-      {# Build the query with virtual columns #}
       {% set query %}
         CREATE OR REPLACE EXTERNAL TABLE {{ full_table_name }} (
           {{ column_definitions | join(',\n  ') }}
@@ -35,6 +35,10 @@
       {% endset %}
 
       {{ run_query(query.strip()) }}
+      {{ run_query('ALTER EXTERNAL TABLE ' ~ full_table_name ~ ' REFRESH') }}
+
+    {% else %}
+      {{ log("Skipping table: " ~ table_name, info=True) }}
     {% endif %}
   {% endfor %}
 {% endmacro %}
