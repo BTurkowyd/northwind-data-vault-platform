@@ -14,7 +14,7 @@ and historical tracking using open standards and managed AWS services.
 
 ---
 ## Architecture Overview
-![architecture_overview.png](assets/architecture_overview.png)
+![architecture_overview.png](assets/data_infrastructure_-_logical_flow.png)
 
 ---
 ## 🔧 Infrastructure Setup and Tools
@@ -185,7 +185,7 @@ This project uses standard Data Vault layers:
 
 ---
 ### 📊 Data Vault Model Diagram
-![data_vault_structure.png](assets/data_infrastructure_-_logical_flow.png)
+![data_vault_structure.png](assets/data_vault_structure.png)
 ---
 ### 🧪 Running dbt
 Before running dbt, ensure you have Python dependencies installed. Use the `pipenv` environment to manage Python packages:
