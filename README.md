@@ -23,7 +23,7 @@ and historical tracking using open standards and managed AWS services.
 
 Make sure you have the following installed:
 
-- [Python 3.8+](https://www.python.org/downloads/)
+- [Python 3.13](https://www.python.org/downloads/)
 - [pipenv](https://pypi.org/project/pipenv/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [tenv](https://github.com/tofuutils/tenv) – A CLI tool to easily install and manage versions of:
