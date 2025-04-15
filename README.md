@@ -26,10 +26,10 @@ Make sure you have the following installed:
 - [Python 3.13](https://www.python.org/downloads/)
 - [pipenv](https://pypi.org/project/pipenv/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-- [tenv](https://github.com/tofuutils/tenv) – A CLI tool to easily install and manage versions of:
-  - [Terraform](https://developer.hashicorp.com/terraform)
-  - [Terragrunt](https://terragrunt.gruntwork.io/)
-  - [OpenTofu (optional, but recommended)](https://opentofu.org/)
+- [**tenv**](https://github.com/tofuutils/tenv) – A CLI tool to easily install and manage versions of:
+  - [**OpenTofu**](https://opentofu.org/) – a community-driven, open-source alternative to Terraform (**recommended** ✅)
+  - [**Terraform**](https://developer.hashicorp.com/terraform) – legacy option still widely used
+  - [**Terragrunt**](https://terragrunt.gruntwork.io/) – a thin wrapper for managing Terraform/OpenTofu configurations
 - [dbt CLI](https://docs.getdbt.com/) - this will be installed via `pipenv` in one of the next steps
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
 - A working Snowflake account (for data warehousing)
