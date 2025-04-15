@@ -3,8 +3,21 @@
     on_schema_change='sync_all_columns'
 ) }}
 
-with order_lines as (
+with latest_sat_order_products as (
+    select *
+    from (
+        select
+            *,
+            row_number() over (
+                partition by link_order_product_key
+                order by load_ts desc
+            ) as row_num
+        from {{ ref('sat_order_products') }}
+    ) as ranked
+    where row_num = 1
+),
 
+order_lines as (
     select
         l.link_order_product_key,
         l.hub_order_key,
@@ -13,13 +26,12 @@ with order_lines as (
         p.quantity,
         p.discount,
         -- Revenue calc
-        p.unit_price * p.quantity * (1 - p.discount) as revenue,
+        round(p.unit_price * p.quantity * (1 - p.discount), 2) as revenue,
         p.load_ts as line_load_ts,
         p.record_source as line_record_source
     from {{ ref('link_order_products') }} l
-    join {{ ref('sat_order_products') }} p
+    join latest_sat_order_products p
         on l.link_order_product_key = p.link_order_product_key
-
 ),
 
 orders as (
