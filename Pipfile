@@ -11,6 +11,7 @@ sqlfluff = "*"
 sqlfluff-templater-dbt = "*"
 
 [dev-packages]
+diagrams = {version = ">=0.2.4", markers = "python_version >= '3.12'"}
 
 [requires]
 python_version = "3.13"
