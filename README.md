@@ -185,7 +185,7 @@ This project uses standard Data Vault layers:
 
 ---
 ### 📊 Data Vault Model Diagram
-![data_vault_structure.png](assets/data_vault_structure.png)
+![data_vault_structure.png](assets/data_infrastructure_-_logical_flow.png)
 ---
 ### 🧪 Running dbt
 Before running dbt, ensure you have Python dependencies installed. Use the `pipenv` environment to manage Python packages:
