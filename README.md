@@ -24,13 +24,13 @@ and historical tracking using open standards and managed AWS services.
 Make sure you have the following installed:
 
 - [Python 3.13](https://www.python.org/downloads/)
-- [pipenv](https://pypi.org/project/pipenv/)
+- [uv](https://docs.astral.sh/uv/) - a Python package manager
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [**tenv**](https://github.com/tofuutils/tenv) – A CLI tool to easily install and manage versions of:
   - [**OpenTofu**](https://opentofu.org/) – a community-driven, open-source alternative to Terraform (**recommended** ✅)
   - [**Terraform**](https://developer.hashicorp.com/terraform) – legacy option still widely used
   - [**Terragrunt**](https://terragrunt.gruntwork.io/) – a thin wrapper for managing Terraform/OpenTofu configurations
-- [dbt CLI](https://docs.getdbt.com/) - this will be installed via `pipenv` in one of the next steps
+- [dbt CLI](https://docs.getdbt.com/) - this will be installed via `uv` in one of the next steps
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
 - A working Snowflake account (for data warehousing)
 
@@ -191,10 +191,13 @@ This project uses standard Data Vault layers:
 ![data_vault_structure.png](assets/data_vault_structure.png)
 ---
 ### 🧪 Running dbt
-Before running dbt, ensure you have Python dependencies installed. Use the `pipenv` environment to manage Python packages:
+Before running dbt, ensure you have Python dependencies installed. Use the `uv` environment to manage Python packages:
 ```bash
 cd root_repo_directory
-pipenv install
+uv venv .venv
+uv pip install -r requirements.txt # without developer packages
+# OR
+uv pip install -r requirements-dev.txt # with developer packages
 ```
 Then, set up your dbt profile. Update the `./northwind_dbt/dbt/profile.yml` file with the following content:
 
