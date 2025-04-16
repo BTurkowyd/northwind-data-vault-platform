@@ -1,0 +1,6 @@
+-r requirements.in
+
+diagrams>=0.2.4; python_version >= "3.12"
+pre-commit>=4.2.0; python_version >= "3.12"
+sqlfluff
+sqlfluff-templater-dbt
