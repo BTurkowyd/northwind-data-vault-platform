@@ -4,3 +4,4 @@
 /.venv/
 /logs/
 .idea/
+**/.user.yml
