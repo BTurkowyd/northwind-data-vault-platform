@@ -103,7 +103,7 @@ make snowflake-apply
   (You can customize this if you use a different backend setup.)
 - Cost Control Tips:
   - Services like AWS Glue, Aurora, and NAT Gateway can be costly.
-  E.g. notice that VPC Endpoints in `terraform/vpc.tf` are commented out to destroy them when not used, to save costs.
+  E.g., notice that VPC Endpoints in `terraform/vpc.tf` are commented out to destroy them when not used, to save costs.
   - Use Aurora Serverless v2, minimal worker types for Glue, and enable auto-pause where possible.
   - Clean up dev/test environments when idle to avoid unexpected charges.
 - Infrastructure Change Workflow:
@@ -111,9 +111,9 @@ make snowflake-apply
 
 ---
 ## Loading Data into Aurora PostgreSQL
-- This is a one-time setup to load sample data into the Aurora PostgreSQL database, therefore it is done manually directly from the AWS console:
+- This is a one-time setup to load sample data into the Aurora PostgreSQL database, therefore, it is done manually directly from the AWS console:
   - Navigate to the RDS Console
-  - Go to Query Editor, select the Aurora PostgreSQL instance, secret from Secrets Manager, and connect.
+  - Go to Query Editor, select the Aurora PostgreSQL instance, the secret from Secrets Manager, and connect.
   - Use the SQL query from https://github.com/pthom/northwind_psql/blob/master/northwind.sql
   - Verify that the data is loaded successfully.
 
@@ -142,7 +142,7 @@ This project uses **AWS Glue** and **Apache Iceberg** to extract data from an **
 
 ### 🚀 Running the ETL Job
 
-Once your infrastructure and source DB are set up, you can trigger the ETL job manually from the AWS Console, or via CLI:
+Once your infrastructure and source DB are set up, you can trigger the ETL job manually from the AWS Console or via CLI:
 
 ```bash
 aws glue start-job-run --job-name northwind-iceberg-aurora-to-s3-etl-dev
@@ -154,8 +154,8 @@ Remember to use the AWS CLI profile that has access to the Glue job and S3 bucke
 ## 🧱 Data Modeling with dbt:  Data Vault 2.0 and Marts
 
 Once raw data from Aurora is loaded into S3 Iceberg tables, **dbt** is used to transform it into a well-modeled Data Vault structure
-and creates marts afterward. While `marts` are not part of the Data Vault, they are built on top of it for analytical purposes,
-thus for the sake of this project, they are included in the same dbt project and included in this section.
+and create marts afterward. While `marts` are not part of the Data Vault, they are built on top of it for analytical purposes;
+thus, for this project's sake, they are included in the same dbt project and included in this section.
 
 ### 📐 Data Vault Components
 
@@ -258,8 +258,6 @@ The aim is to ensure data accuracy, consistency, and reliability through the fol
 - **dbt Tests**
   - `unique` and `not_null` tests on hub primary keys and link composite keys
   - `accepted_values` for enums (e.g. order status)
-- **Hashdiff logic in Satellites**
-  - Ensures only changed records are added (SCD Type 2 behavior)
 - **Potential improvements**
   - Add row count checks across layers (raw → vault)
   - Validate foreign key relationships between hubs, links, and satellites
@@ -282,11 +280,10 @@ Currently, this project is executed manually, but it’s designed with automatio
 
 
 ---
-## 🌱 Future Enhancements & Roadmap
+## 🌱 Roadmap
 
 Here's what could be explored next:
 
 - [ ] **Point-In-Time (PIT) Tables** for snapshot-style historical joins
 - [ ] **Bridge Tables** for many-to-many relationships (e.g. products in orders)
-- [ ] **Data Marts** built on top of the vault (star schema views)
 - [ ] **Automated data loading** into Aurora via CDC or batch ingestion
