@@ -195,6 +195,7 @@ Before running dbt, ensure you have Python dependencies installed. Use the `uv` 
 ```bash
 cd root_repo_directory
 uv venv .venv
+source .venv/bin/activate
 uv pip install -r requirements.txt # without developer packages
 # OR
 uv pip install -r requirements-dev.txt # with developer packages
