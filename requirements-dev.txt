@@ -71,7 +71,7 @@ dbt-athena==1.9.2
     # via dbt-athena-community
 dbt-athena-community==1.9.2
     # via -r requirements.in
-dbt-common==1.19
+dbt-common==1.21.0
     # via
     #   dbt-adapters
     #   dbt-athena
@@ -209,6 +209,8 @@ protobuf==5.29.4
     #   dbt-adapters
     #   dbt-common
     #   dbt-core
+py4j==0.10.9.7
+    # via pyspark
 pyathena==3.12.2
     # via dbt-athena
 pycparser==2.22
@@ -225,6 +227,8 @@ pyjwt==2.10.1
     # via snowflake-connector-python
 pyopenssl==25.0.0
     # via snowflake-connector-python
+pyspark==3.5.5
+    # via -r requirements.in
 pytest==8.3.5
     # via sqlfluff
 python-dateutil==2.9.0.post0
@@ -276,11 +280,11 @@ snowplow-tracker==1.1.0
     # via dbt-core
 sortedcontainers==2.4.0
     # via snowflake-connector-python
-sqlfluff==3.3.1
+sqlfluff==3.4.0
     # via
     #   -r requirements-dev.in
     #   sqlfluff-templater-dbt
-sqlfluff-templater-dbt==3.3.1
+sqlfluff-templater-dbt==3.4.0
     # via -r requirements-dev.in
 sqlparse==0.5.3
     # via dbt-core
@@ -309,8 +313,6 @@ typing-extensions==4.13.2
     #   mashumaro
     #   pydantic
     #   pydantic-core
-    #   pyopenssl
-    #   referencing
     #   snowflake-connector-python
     #   snowplow-tracker
     #   typing-inspection
