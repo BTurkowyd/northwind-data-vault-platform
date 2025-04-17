@@ -1,51 +1,22 @@
-import json
 import sys
-import boto3
-from awsglue.utils import getResolvedOptions
-from pyspark.sql import SparkSession
 import logging
-
-# Get the Aurora credentials from Secrets Manager
-args = getResolvedOptions(
-    sys.argv,
-    [
-        "AURORA_CREDS_SECRET",
-        "DESTINATION_BUCKET",
-        "DESTINATION_DIRECTORY",
-        "DEBUG",
-        "GLUE_DATABASE",
-    ],
+from modules.helpers import (
+    create_spark_session,
+    get_aurora_credentials,
+    get_job_arguments,
+    configure_logging,
 )
+
+args = get_job_arguments()
 
 debug = args["DEBUG"]
 
-if debug:
-    logging.debug(f"DEBUG: {debug}")
-
-    logging.debug(f"ARGS: {args}")
-    logging.debug(f"Secrets Manager Secret: {args['AURORA_CREDS_SECRET']}")
-    logging.debug(f"Destination Bucket: {args['DESTINATION_BUCKET']}")
-    logging.debug(f"Destination Directory: {args['DESTINATION_DIRECTORY']}")
-
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s | %(levelname)s | %(filename)s:%(lineno)d | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-else:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+configure_logging(debug, args)
 
 logging.info("Starting Glue ETL job...")
 
-client = boto3.client("secretsmanager", region_name="eu-central-1")
-
 try:
-    secret = client.get_secret_value(SecretId=args["AURORA_CREDS_SECRET"])
-    secrets = json.loads(secret["SecretString"])
+    secrets = get_aurora_credentials(args["AURORA_CREDS_SECRET"])
     logging.info("Successfully retrieved Aurora credentials.")
     if debug:
         logging.debug(f"Secrets: {secrets}")
@@ -54,27 +25,7 @@ except Exception as e:
     logging.error(f"ERROR: Failed to retrieve credentials from Secrets Manager: {e}")
     sys.exit(1)
 
-spark = (
-    SparkSession.builder.config(
-        "spark.sql.catalog.glue_catalog", "org.apache.iceberg.spark.SparkCatalog"
-    )
-    .config(
-        "spark.sql.catalog.glue_catalog.warehouse",
-        f"s3://{args['DESTINATION_BUCKET']}/{args['DESTINATION_DIRECTORY']}",
-    )
-    .config(
-        "spark.sql.catalog.glue_catalog.catalog-impl",
-        "org.apache.iceberg.aws.glue.GlueCatalog",
-    )
-    .config(
-        "spark.sql.catalog.glue_catalog.io-impl", "org.apache.iceberg.aws.s3.S3FileIO"
-    )
-    .config(
-        "spark.sql.extensions",
-        "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
-    )
-    .getOrCreate()
-)
+spark = create_spark_session(args)
 
 if debug:
     logging.debug("Spark session created.")
