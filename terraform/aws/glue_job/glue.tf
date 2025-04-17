@@ -37,6 +37,7 @@ resource "aws_glue_job" "glue_etl_job" {
   default_arguments = {
     "--TempDir"                          = "s3://${var.bucket.bucket}/temp"
     "--job-language"                     = "python"
+    "--extra-py-files"                   = "s3://${aws_s3_object.python_modules.bucket}/${aws_s3_object.python_modules.key}"
     "--enable-metrics"                   = "true"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-spark-ui"                  = "true"
@@ -61,4 +62,18 @@ resource "aws_s3_object" "glue_etl_script" {
   key    = "scripts/${var.raw_data_directory}_etl.py"
   source = "${path.module}/src/glue_etl.py"
   etag   = filemd5("${path.module}/src/glue_etl.py")
+}
+
+data "archive_file" "python_modules" {
+  type        = "zip"
+  output_path = "${path.module}/build/python_modules.zip"
+  source_dir  = "${path.module}/src"
+  excludes    = ["*.pyc", "*.pyo", "__pycache__", "glue_etl.py"]
+}
+
+resource "aws_s3_object" "python_modules" {
+  bucket = var.bucket.bucket
+  key    = "scripts/python_modules.zip"
+  source = data.archive_file.python_modules.output_path
+  etag   = filemd5(data.archive_file.python_modules.output_path)
 }
