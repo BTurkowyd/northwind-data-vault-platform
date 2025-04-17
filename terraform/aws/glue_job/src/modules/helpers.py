@@ -4,6 +4,7 @@ import sys
 from pyspark.sql import SparkSession
 import boto3
 from awsglue.utils import getResolvedOptions  # type: ignore
+from .typedict import GlueJobArgs, AuroraCredentials
 
 
 def create_spark_session(args):
@@ -43,7 +44,7 @@ def create_spark_session(args):
     return spark
 
 
-def get_aurora_credentials(secret_name):
+def get_aurora_credentials(secret_name) -> AuroraCredentials:
     """
     Retrieve Aurora credentials from AWS Secrets Manager.
 
@@ -59,7 +60,7 @@ def get_aurora_credentials(secret_name):
     return secrets
 
 
-def get_job_arguments():
+def get_job_arguments() -> GlueJobArgs:
     """
     Retrieve job arguments passed to the Glue job.
 
