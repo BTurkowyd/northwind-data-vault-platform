@@ -31,5 +31,5 @@ repos:
         language: system
         files: \.tf$
 
-default_stages: [commit]
+default_stages: [pre-commit]
 exclude: ^(\.sqlfluff|\.dbt)/.*
