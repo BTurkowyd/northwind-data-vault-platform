@@ -8,6 +8,11 @@ variable "snowflake_integration_iam_role" {
   type        = string
 }
 
+variable "data_vault_bucket_name" {
+  description = "The S3 bucket name for data vault"
+  type        = string
+}
+
 variable "snowflake_iam_user" {
   description = "The IAM user for Snowflake"
   type        = string
