@@ -21,7 +21,7 @@ and historical tracking using open standards and managed AWS services.
 
 ### 📦 Tools You’ll Need
 
-Make sure you have the following installed:
+Make sure you have the following software installed:
 
 - [Python 3.13](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/) - a Python package manager
@@ -31,10 +31,31 @@ Make sure you have the following installed:
   - [**Terraform**](https://developer.hashicorp.com/terraform) – legacy option still widely used
   - [**Terragrunt**](https://terragrunt.gruntwork.io/) – a thin wrapper for managing Terraform/OpenTofu configurations
 - [dbt CLI](https://docs.getdbt.com/) - this will be installed via `uv` in one of the next steps
+
+### 🛠️ Prerequisites
+
+Prior to running the project, ensure you have the following things configured:
+
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
 - A working Snowflake account (for data warehousing)
 - AWS and Snowflake accounts should be configured so AWS can give the Snowflake account access to the S3 bucket.
-Under [this link](https://docs.snowflake.com/en/user-guide/tables-iceberg-configure-external-volume-s3) you can find a detailed guide on how to do this.
+Under [this link](https://docs.snowflake.com/en/user-guide/tables-iceberg-configure-external-volume-s3) you can find a
+detailed guide on how to do this. **Keep in mind that the IAM role for the Snowflake account is a part of the infrastructure,
+thus this step can be configured later**
+- In order to access the Snowflake account, `dbt` uses the SSH key authentication method. Under
+[this link](https://docs.snowflake.com/en/user-guide/key-pair-auth) you can find a detailed guide on how to set this up.
+- Sensitive information (e.g., AWS credentials, Snowflake private key) should be stored in environment variables.
+E.g. in an `.env` file. For this project, the following environment variables are required:
+```bash
+ATHENA_STAGING_DIR="a staging directory for Athena query results (and iceberg tables afterwards)"
+SNOWFLAKE_EXTERNAL_ID="a unique identifier for Snowflake to access the S3 bucket"
+SNOWFLAKE_ACCOUNT_ARN="an ARN of the Snowflake account that will access the S3 bucket"
+SNOWFLAKE_ORGANIZATION_NAME="a Snowflake organization name"
+SNOWFLAKE_ACCOUNT_NAME="a Snowflake account name"
+SNOWFLAKE_USER="a Snowflake user name"
+SNOWFLAKE_ROLE="a Snowflake role name"
+SNOWFLAKE_PRIVATE_KEY="a path to the Snowflake private SSH key"
+```
 
 🧭 **Region:** This project is configured for the `eu-central-1` region by default.
 🏗️ **Environment:** All Terragrunt modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
