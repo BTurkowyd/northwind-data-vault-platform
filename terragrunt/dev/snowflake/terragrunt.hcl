@@ -21,4 +21,5 @@ inputs =  {
   data_vault_bucket_name = dependency.aws.outputs.bucket_name
   snowflake_iam_user = get_env("SNOWFLAKE_ACCOUNT_ARN", "")
   snowflake_user = get_env("SNOWFLAKE_USER", "")
+  iceberg_tables_location = get_env("ATHENA_STAGING_DIR", "")
 }

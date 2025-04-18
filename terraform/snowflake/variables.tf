@@ -13,6 +13,11 @@ variable "data_vault_bucket_name" {
   type        = string
 }
 
+variable "iceberg_tables_location" {
+  description = "The S3 location for iceberg tables"
+  type        = string
+}
+
 variable "snowflake_iam_user" {
   description = "The IAM user for Snowflake"
   type        = string
