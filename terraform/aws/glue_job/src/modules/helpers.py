@@ -17,6 +17,12 @@ def create_spark_session(args: GlueJobArgs) -> SparkSession:
     Returns:
         SparkSession: The configured Spark session.
     """
+    if args["DESTINATION_BUCKET"] in (None, "") or args["DESTINATION_DIRECTORY"] in (
+        None,
+        "",
+    ):
+        raise Exception("DESTINATION_BUCKET and DESTINATION_DIRECTORY must be provided")
+
     # Create a Spark session with Glue Catalog
     spark = (
         SparkSession.builder.config(
