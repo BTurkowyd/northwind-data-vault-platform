@@ -7,7 +7,7 @@ This project builds a modern, scalable data warehouse architecture using:
 - dbt for implementing Data Vault 2.0 modeling
 - Snowflake for data warehousing and analytics
 - Amazon Athena as the query engine
-- Terraform for infrastructure provisioning
+- OpenTofu/Terragrunt for infrastructure provisioning
 
 The goal is to demonstrate how to build a production-grade, cloud-native analytical platform for batch data processing
 and historical tracking using open standards and managed AWS services.
@@ -33,15 +33,17 @@ Make sure you have the following installed:
 - [dbt CLI](https://docs.getdbt.com/) - this will be installed via `uv` in one of the next steps
 - A working AWS account with sufficient permissions (IAM, VPC, Glue, RDS, etc.)
 - A working Snowflake account (for data warehousing)
+- AWS and Snowflake accounts should be configured so AWS can give the Snowflake account access to the S3 bucket.
+Under [this link](https://docs.snowflake.com/en/user-guide/tables-iceberg-configure-external-volume-s3) you can find a detailed guide on how to do this.
 
 🧭 **Region:** This project is configured for the `eu-central-1` region by default.
-🏗️ **Environment:** All Terraform modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
+🏗️ **Environment:** All Terragrunt modules are structured per environment (e.g., `dev`, `prod`), and the working example uses `dev`.
 
 ---
 
 ### 🛠️ Infrastructure Overview
 
-This project provisions the following infrastructure using Terraform + Terragrunt:
+This project provisions the following infrastructure using OpenTofu/Terraform + Terragrunt:
 
 #### AWS
 - **VPC with Public & Private Subnets**
@@ -268,7 +270,7 @@ The aim is to ensure data accuracy, consistency, and reliability through the fol
 Currently, this project is executed manually, but it’s designed with automation-readiness in mind.
 
 - **Manual Flow**
-  - Terraform/Terragrunt for infrastructure
+  - OpenTofu/Terraform/Terragrunt for infrastructure
   - AWS Glue console for ETL
   - `dbt run` for transformations
   - `dbt docs generate` for documentation
