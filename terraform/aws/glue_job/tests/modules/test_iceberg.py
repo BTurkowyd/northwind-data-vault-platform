@@ -32,11 +32,13 @@ def test_write_to_iceberg_invokes_temp_view_and_sql(mock_spark, mock_df):
     "invalid_table", ["", "123table", "bad-name!", "with space", None]
 )
 def test_invalid_table_name_raises(mock_spark, mock_df, invalid_table):
+    """Test that invalid table names raise ValueError"""
     with pytest.raises(ValueError, match="Invalid table name"):
         write_to_iceberg(mock_spark, mock_df, invalid_table, "analytics")
 
 
 @pytest.mark.parametrize("invalid_db", ["", "123db", "invalid-db!", "with space", None])
 def test_invalid_db_name_raises(mock_spark, mock_df, invalid_db):
+    """Test that invalid database names raise ValueError"""
     with pytest.raises(ValueError, match="Invalid database name"):
         write_to_iceberg(mock_spark, mock_df, "valid_table", invalid_db)
