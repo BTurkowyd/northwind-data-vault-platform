@@ -7,9 +7,8 @@ from modules.helpers import (
     get_aurora_credentials,
     get_job_arguments,
     configure_logging,
-    get_jdbc_options,
 )
-from modules.jdbc import fetch_table_names, load_table_as_df
+from modules.jdbc import fetch_table_names, load_table_as_df, get_jdbc_options
 from modules.iceberg import write_to_iceberg
 
 

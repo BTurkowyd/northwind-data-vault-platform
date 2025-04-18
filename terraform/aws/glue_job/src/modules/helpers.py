@@ -99,12 +99,3 @@ def configure_logging(debug, args):
             format="%(asctime)s | %(levelname)s | %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
-
-
-def get_jdbc_options(jdbc_url: str, secrets: dict) -> dict:
-    return {
-        "url": jdbc_url,
-        "user": secrets["username"],
-        "password": secrets["password"],
-        "driver": "org.postgresql.Driver",
-    }
