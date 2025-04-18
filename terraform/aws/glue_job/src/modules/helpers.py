@@ -7,7 +7,7 @@ from awsglue.utils import getResolvedOptions  # type: ignore
 from .typedict import GlueJobArgs, AuroraCredentials
 
 
-def create_spark_session(args):
+def create_spark_session(args: GlueJobArgs) -> SparkSession:
     """
     Create a Spark session with the specified configurations.
 
@@ -44,7 +44,7 @@ def create_spark_session(args):
     return spark
 
 
-def get_aurora_credentials(secret_name) -> AuroraCredentials:
+def get_aurora_credentials(secret_name: str) -> AuroraCredentials:
     """
     Retrieve Aurora credentials from AWS Secrets Manager.
 
@@ -79,7 +79,12 @@ def get_job_arguments() -> GlueJobArgs:
     )
 
 
-def configure_logging(debug, args):
+def configure_logging(debug: bool, args: GlueJobArgs) -> None:
+    """
+    Configure logging for the Glue job.
+    :param debug: The debug flag indicating whether to enable debug logging.
+    :param args: The arguments passed to the Glue job.
+    """
     if debug:
         logging.debug(f"DEBUG: {debug}")
 

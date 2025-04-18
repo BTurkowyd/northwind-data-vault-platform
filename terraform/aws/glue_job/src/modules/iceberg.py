@@ -2,6 +2,12 @@ from pyspark.sql import SparkSession, DataFrame
 
 
 def write_to_iceberg(spark: SparkSession, df: DataFrame, table_name: str, db: str):
+    """
+    :param spark: The Spark session.
+    :param df: The DataFrame to be written to Iceberg.
+    :param table_name: The name for the Iceberg table where the DataFrame will be written.
+    :param db: The database name in Glue Catalog.
+    """
     df.createOrReplaceTempView(f"tmp_{table_name}")
     spark.sql(
         f"""
