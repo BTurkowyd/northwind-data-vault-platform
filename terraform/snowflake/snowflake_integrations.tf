@@ -3,7 +3,7 @@ resource "snowflake_storage_integration" "s3_integration" {
   storage_provider = "S3"
   enabled          = true
   storage_allowed_locations = [
-    "s3://ecommerce-bucket-dev-926728314305-q1c4tvebvzy7chgggfuyva/northwind_data_vault/northwind_data_vault/"
+    "${var.iceberg_tables_location}/tables/northwind_data_vault"
   ]
   storage_aws_role_arn = var.snowflake_integration_iam_role
 }
@@ -13,7 +13,7 @@ resource "snowflake_stage" "s3_stage" {
   directory           = "ENABLE = true"
   database            = snowflake_database.my_db.name
   schema              = snowflake_schema.northwind_schema.name
-  url                 = "s3://ecommerce-bucket-dev-926728314305-q1c4tvebvzy7chgggfuyva/northwind_data_vault/northwind_data_vault/"
+  url                 = "${var.iceberg_tables_location}/tables/northwind_data_vault"
   storage_integration = snowflake_storage_integration.s3_integration.name
 
   file_format = "TYPE = PARQUET NULL_IF = []"
