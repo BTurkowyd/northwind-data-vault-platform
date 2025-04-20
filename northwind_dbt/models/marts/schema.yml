@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: mart_sales
+    description: |
+      Final fact table for order line transactions.
+      Includes product-level sales metrics such as unit price, quantity, discount, and calculated revenue.
+      Enriched with order-level information like freight cost and shipment dates.
+
+    columns:
+      - name: link_order_product_key
+        description: "Unique identifier for the order-product relationship."
+
+      - name: hub_order_key
+        description: "Business key representing the order."
+        meta:
+          pii: true
+          sensitivity: critical
+
+      - name: hub_product_key
+        description: "Business key representing the product."
+        meta:
+          pii: true
+          sensitivity: critical
+
+      - name: order_date
+        description: "The date the order was placed."
+        meta:
+          pii: true
+          sensitivity: critical
+
+      - name: shipped_date
+        description: "The date the order was shipped."
+        meta:
+          pii: true
+          sensitivity: critical
+
+      - name: freight
+        description: "Shipping cost associated with the order."
+
+      - name: unit_price
+        description: "Price of a single unit at the time of sale."
+
+      - name: quantity
+        description: "Number of units ordered."
+
+      - name: discount
+        description: "Discount applied to this order line."
+
+      - name: revenue
+        description: "Net revenue for the line item after applying discount."
+        tests:
+          - not_null
+
+      - name: line_load_ts
+        description: "Timestamp when the satellite record was last loaded."
+
+      - name: line_record_source
+        description: "Indicates the system or process that provided this data."
