@@ -34,12 +34,11 @@ jobs:
 #      - name: Check AWS CLI version
 #        run: aws --version
 
-      - name: Install tenv from GitHub release
+      - name: Install tenv v4.4.0
         run: |
-          curl -L https://github.com/tofuutils/tenv/releases/latest/download/tenv-linux-amd64 -o tenv
-          chmod +x tenv
-          sudo mv tenv /usr/local/bin/tenv
-          echo "tenv installed: $(tenv --version)"
+          curl -O -L "https://github.com/tofuutils/tenv/releases/download/v4.4.0/tenv_v4.4.0_amd64.deb"
+          sudo dpkg -i "tenv_v4.4.0_amd64.deb"
+          tenv --version
 
       - name: Install OpenTofu and Terragrunt
         run: |
