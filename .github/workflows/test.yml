@@ -1,16 +1,23 @@
-name: Run Pytest on Push
+name: Pytest ➝ Terragrunt Plan
 
-on: [push]
+on:
+  push:
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  test:
+  test-and-plan:
+    name: Pytest ➝ Terragrunt Plan
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -19,7 +26,37 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Install dev dependencies with uv
-        run: uv pip install --system -r requirements-dev.txt
+        run: uv pip install --system -r dev-requirements.txt
 
-      - name: Run pytest
+      - name: Run Pytest
         run: pytest
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          aws --version
+
+      - name: Install tenv (OpenTofu, Terragrunt, etc.)
+        run: |
+          curl -fsSL https://install.tenv.sh | bash
+          echo "$HOME/.tenv/bin" >> $GITHUB_PATH
+          tenv install opentofu
+          tenv use opentofu
+          tenv install terragrunt
+          tenv use terragrunt
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Run Terragrunt Init
+        run: terragrunt init
+        working-directory: path/to/your/live/env
+
+      - name: Run Terragrunt Plan
+        run: terragrunt plan
+        working-directory: path/to/your/live/env
