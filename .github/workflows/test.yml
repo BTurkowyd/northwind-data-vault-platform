@@ -26,7 +26,7 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Install dev dependencies with uv
-        run: uv pip install --system -r dev-requirements.txt
+        run: uv pip install --system -r requirements-dev.txt
 
       - name: Run Pytest
         run: pytest
