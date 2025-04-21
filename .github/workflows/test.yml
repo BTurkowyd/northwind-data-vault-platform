@@ -56,9 +56,7 @@ jobs:
           aws-region: eu-central-1
 
       - name: Run Terragrunt Init
-        run: terragrunt init
-        working-directory: terragrunt/dev/aws
+        run: make aws-init
 
       - name: Run Terragrunt Plan
-        run: terragrunt plan
-        working-directory: terragrunt/dev/aws
+        run: make aws-plan
