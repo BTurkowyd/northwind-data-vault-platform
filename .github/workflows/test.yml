@@ -8,6 +8,10 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  SNOWFLAKE_EXTERNAL_ID: ${{ secrets.SNOWFLAKE_EXTERNAL_ID }}
+  SNOWFLAKE_ACCOUNT_ARN: ${{ secrets.SNOWFLAKE_ACCOUNT_ARN }}
+
 jobs:
   test-and-plan:
     name: Pytest ➝ Terragrunt Plan
