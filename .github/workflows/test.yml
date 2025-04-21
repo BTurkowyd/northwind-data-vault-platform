@@ -1,16 +1,31 @@
-name: Run Pytest on Push
+name: Pytest ➝ Terragrunt Plan
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  SNOWFLAKE_EXTERNAL_ID: ${{ secrets.SNOWFLAKE_EXTERNAL_ID }}
+  SNOWFLAKE_ACCOUNT_ARN: ${{ secrets.SNOWFLAKE_ACCOUNT_ARN }}
 
 jobs:
-  test:
+  test-and-plan:
+    name: Pytest ➝ Terragrunt Plan
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -21,5 +36,38 @@ jobs:
       - name: Install dev dependencies with uv
         run: uv pip install --system -r requirements-dev.txt
 
-      - name: Run pytest
+      - name: Run Pytest
         run: pytest
+
+      - name: Check AWS CLI version
+        run: aws --version
+
+      - name: Install tenv v4.4.0
+        run: |
+          curl -O -L "https://github.com/tofuutils/tenv/releases/download/v4.4.0/tenv_v4.4.0_amd64.deb"
+          sudo dpkg -i "tenv_v4.4.0_amd64.deb"
+          tenv --version
+
+      - name: Install OpenTofu and Terragrunt
+        run: |
+          tenv tg install 0.75.9
+          tenv tofu install 1.9.0
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Run Terragrunt Init
+        run: terragrunt init
+        working-directory: terragrunt/dev/aws
+
+      - name: Run Terragrunt Plan
+        run: terragrunt plan
+        working-directory: terragrunt/dev/aws
+
+      - name: Run Terragrunt Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terragrunt apply -auto-approve
+        working-directory: terragrunt/dev/aws
