@@ -42,10 +42,8 @@ jobs:
 
       - name: Install OpenTofu and Terragrunt
         run: |
-          tenv install opentofu
-          tenv use opentofu
-          tenv install terragrunt
-          tenv use terragrunt
+          tenv tg install 0.75.9
+          tenv tofu install 1.9.0
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v3
@@ -55,8 +53,8 @@ jobs:
 
       - name: Run Terragrunt Init
         run: terragrunt init
-        working-directory: path/to/your/live/env
+        working-directory: terragrunt/dev/aws
 
       - name: Run Terragrunt Plan
         run: terragrunt plan
-        working-directory: path/to/your/live/env
+        working-directory: terragrunt/dev/aws
