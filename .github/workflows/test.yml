@@ -68,5 +68,6 @@ jobs:
         working-directory: terragrunt/dev/aws
 
       - name: Run Terragrunt Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terragrunt apply -auto-approve
         working-directory: terragrunt/dev/aws
