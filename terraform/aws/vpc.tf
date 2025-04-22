@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name = "dbt-data-vault-vpc"
+    Name = "${var.repo_name}-vpc"
   }
 }
 
@@ -17,7 +17,7 @@ resource "aws_subnet" "subnet1" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "dbt-data-vault-subnet-1"
+    Name = "${var.repo_name}-subnet-1"
   }
 }
 
@@ -55,7 +55,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "dbt-data-vault-public-subnet"
+    Name = "${var.repo_name}-public-subnet"
   }
 }
 
@@ -64,7 +64,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "dbt-data-vault-igw"
+    Name = "${var.repo_name}-igw"
   }
 }
 
@@ -96,7 +96,7 @@ resource "aws_vpc_endpoint" "s3" {
   ]
 
   tags = {
-    Name = "s3-endpoint"
+    Name = "${var.repo_name}-s3-endpoint"
   }
 }
 
@@ -118,6 +118,6 @@ locals {
 #   security_group_ids  = [aws_security_group.glue_sg.id]
 #
 #   tags = {
-#     Name = "${each.key}-vpc-endpoint"
+#     Name = "${var.repo_name}-${each.key}-vpc-endpoint"
 #   }
 # }

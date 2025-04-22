@@ -17,3 +17,8 @@ variable "snowflake_account_arn" {
   description = "The IAM user ARN from Snowflake integration (STORAGE_AWS_IAM_USER_ARN)"
   type        = string
 }
+
+variable "repo_name" {
+  description = "The name of the repository"
+  type        = string
+}
