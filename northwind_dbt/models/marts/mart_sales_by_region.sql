@@ -1,9 +1,3 @@
-{{ config(
-    materialized='incremental',
-    unique_key='link_order_product_key',
-    on_schema_change='sync_all_columns'
-) }}
-
 with latest_sat_order_products as (
     select
         link_order_product_key,
@@ -69,7 +63,6 @@ region_sales as (
 )
 
 select
-    link_order_product_key
     ship_country,
     ship_region,
     ship_city,

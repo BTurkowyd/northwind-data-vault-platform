@@ -1,8 +1,3 @@
-{{ config(
-    unique_key='link_order_product_key',
-    on_schema_change='sync_all_columns'
-) }}
-
 with latest_sat_order_products as (
     select *
     from (

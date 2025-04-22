@@ -36,7 +36,6 @@ models:
       satellites: {}
       links: {}
     marts:
-      +materialized: incremental
+      +materialized: table
       +table_type: iceberg
       +format: parquet
-      +incremental_strategy: merge

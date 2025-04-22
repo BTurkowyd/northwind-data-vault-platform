@@ -1,9 +1,3 @@
-{{ config(
-    materialized='incremental',
-    unique_key='link_order_product_key',
-    on_schema_change='sync_all_columns'
-) }}
-
 with latest_sat_order_products as (
     select
         link_order_product_key,
@@ -63,7 +57,6 @@ country_year_sales as (
 )
 
 select
-    link_order_product_key
     ship_country,
     date_trunc('year', order_date) as year,
     CAST(ROUND(sum(revenue), 2) AS DECIMAL(10,2)) as total_revenue,
