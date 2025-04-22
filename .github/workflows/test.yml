@@ -87,10 +87,10 @@ jobs:
         run: terragrunt init
         working-directory: terragrunt/dev/snowflake
 
-#      - name: Run Terragrunt Plan on Snowflake infrastructure
-#        run: terragrunt plan
-#        working-directory: terragrunt/dev/snowflake
-#
-#      - name: Run Terragrunt Apply on Snowflake infrastructure
-#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#        run: terragrunt apply -auto-approve
+      - name: Run Terragrunt Plan on Snowflake infrastructure
+        run: terragrunt plan
+        working-directory: terragrunt/dev/snowflake
+
+      - name: Run Terragrunt Apply on Snowflake infrastructure
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terragrunt apply -auto-approve
