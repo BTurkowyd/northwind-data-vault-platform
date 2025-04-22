@@ -1,3 +1,6 @@
+use database northwind_db_dev;
+use schema northwind_schema_dev;
+
 -- Create the role if it doesn't exist
 CREATE ROLE IF NOT EXISTS terragrunt_role;
 
@@ -23,3 +26,6 @@ GRANT ROLE terragrunt_role TO USER github_ci_user;
 GRANT USAGE ON DATABASE NORTHWIND_DB_DEV TO ROLE terragrunt_role;
 GRANT USAGE ON SCHEMA NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV TO ROLE terragrunt_role;
 GRANT USAGE ON STAGE NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV.S3_STAGE_DEV TO ROLE terragrunt_role;
+GRANT USAGE ON WAREHOUSE 'REDACTED' TO ROLE terragrunt_role;
+GRANT USAGE ON INTEGRATION S3_INTEGRATION_DEV TO ROLE terragrunt_role;
+GRANT USAGE ON STAGE S3_STAGE_DEV TO ROLE terragrunt_role;
