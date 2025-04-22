@@ -16,6 +16,7 @@ permissions:
 env:
   SNOWFLAKE_EXTERNAL_ID: ${{ secrets.SNOWFLAKE_EXTERNAL_ID }}
   SNOWFLAKE_ACCOUNT_ARN: ${{ secrets.SNOWFLAKE_ACCOUNT_ARN }}
+  ATHENA_STAGING_DIR: ${{ secrets.ATHENA_STAGING_DIR }}
 
 jobs:
   test-and-plan:
@@ -72,3 +73,6 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terragrunt apply -auto-approve
         working-directory: terragrunt/dev/aws
+
+      - name: Run DBT Pipeline
+        run: make aws-dbt LOCAL=false
