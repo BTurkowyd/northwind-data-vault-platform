@@ -63,6 +63,7 @@ country_year_sales as (
 )
 
 select
+    link_order_product_key
     ship_country,
     date_trunc('year', order_date) as year,
     CAST(ROUND(sum(revenue), 2) AS DECIMAL(10,2)) as total_revenue,

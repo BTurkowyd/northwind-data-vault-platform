@@ -69,6 +69,7 @@ region_sales as (
 )
 
 select
+    link_order_product_key
     ship_country,
     ship_region,
     ship_city,
