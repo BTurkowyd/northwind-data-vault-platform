@@ -26,7 +26,9 @@ aws-apply:
 	$(call TG_CMD, $(AWS_DIR), apply)
 
 aws-dbt:
-	$(ENV) cd $(DBT_DIR) && dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
+	$(ENV) cd $(DBT_DIR) && \
+ 	dbt deps && \
+ 	dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
 	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
 # Snowflake
@@ -44,6 +46,7 @@ snowflake-dbt:
 	DBT_JSON_CATALOG="$$(< $(CATALOG_JSON))" && \
 	export DBT_JSON_CATALOG && \
 	cd $(DBT_DIR) && \
+	dbt deps && \
 	dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt
 
 .PHONY: aws-init aws-plan aws-apply aws-dbt snowflake-init snowflake-plan snowflake-apply snowflake-dbt
