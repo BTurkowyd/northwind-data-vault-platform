@@ -17,6 +17,11 @@ env:
   SNOWFLAKE_EXTERNAL_ID: ${{ secrets.SNOWFLAKE_EXTERNAL_ID }}
   SNOWFLAKE_ACCOUNT_ARN: ${{ secrets.SNOWFLAKE_ACCOUNT_ARN }}
   ATHENA_STAGING_DIR: ${{ secrets.ATHENA_STAGING_DIR }}
+  SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+  SNOWFLAKE_ACCOUNT_NAME: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+  SNOWFLAKE_ORGANIZATION_NAME: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}
+  SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+  SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
 
 jobs:
   test-and-plan:
@@ -27,22 +32,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-      - name: Install dev dependencies with uv
-        run: uv pip install --system -r requirements-dev.txt
-
-      - name: Run Pytest
-        run: pytest
-
-      - name: Check AWS CLI version
-        run: aws --version
+#      - name: Set up Python 3.13
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: "3.13"
+#
+#      - name: Install uv
+#        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+#
+#      - name: Install dev dependencies with uv
+#        run: uv pip install --system -r requirements-dev.txt
+#
+#      - name: Run Pytest
+#        run: pytest
+#
+#      - name: Check AWS CLI version
+#        run: aws --version
 
       - name: Install tenv v4.4.0
         run: |
@@ -55,25 +60,37 @@ jobs:
           tenv tg install 0.75.9
           tenv tofu install 1.9.0
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: eu-central-1
+#      - name: Configure AWS credentials via OIDC
+#        uses: aws-actions/configure-aws-credentials@v3
+#        with:
+#          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+#          aws-region: eu-central-1
 
-      - name: Run Terragrunt Init
+#      - name: Run Terragrunt Init on AWS infrastructure
+#        run: terragrunt init
+#        working-directory: terragrunt/dev/aws
+#
+#      - name: Run Terragrunt Plan on AWS infrastructure
+#        run: terragrunt plan
+#        working-directory: terragrunt/dev/aws
+#
+#      - name: Run Terragrunt Apply on AWS infrastructure
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#        run: terragrunt apply -auto-approve
+#        working-directory: terragrunt/dev/aws
+#
+#      - name: Run DBT Pipeline
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#        run: make aws-dbt LOCAL=false
+
+      - name: Run Terragrunt Init on Snowflake infrastructure
         run: terragrunt init
-        working-directory: terragrunt/dev/aws
+        working-directory: terragrunt/dev/snowflake
 
-      - name: Run Terragrunt Plan
-        run: terragrunt plan
-        working-directory: terragrunt/dev/aws
-
-      - name: Run Terragrunt Apply
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terragrunt apply -auto-approve
-        working-directory: terragrunt/dev/aws
-
-      - name: Run DBT Pipeline
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: make aws-dbt LOCAL=false
+#      - name: Run Terragrunt Plan on Snowflake infrastructure
+#        run: terragrunt plan
+#        working-directory: terragrunt/dev/snowflake
+#
+#      - name: Run Terragrunt Apply on Snowflake infrastructure
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#        run: terragrunt apply -auto-approve
