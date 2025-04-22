@@ -75,4 +75,5 @@ jobs:
         working-directory: terragrunt/dev/aws
 
       - name: Run DBT Pipeline
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: make aws-dbt LOCAL=false
