@@ -3,6 +3,7 @@ locals {
   bucket = "terraform-states-6mabw3s4smjiozsqyi76rq"
   key = "terraform/dbt-data-vault/${path_relative_to_include()}/terraform.tfstate"
   profile = get_env("AWS_PROFILE", "")
+  repo_name = "northwind-data-vault-platform"
 }
 
 generate "provider" {
@@ -14,6 +15,11 @@ generate "provider" {
         %{ if local.profile != "" }
         profile = "${local.profile}"
         %{ endif }
+       default_tags {
+         tags = {
+           repo_name = "${local.repo_name}"
+         }
+       }
       }
   EOT
 }
