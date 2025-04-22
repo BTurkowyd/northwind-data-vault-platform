@@ -6,6 +6,10 @@ locals {
   repo_name = "northwind-data-vault-platform"
 }
 
+inputs = {
+  repo_name = local.repo_name
+}
+
 generate "provider" {
   path = "provider.tf"
   if_exists = "overwrite_terragrunt"

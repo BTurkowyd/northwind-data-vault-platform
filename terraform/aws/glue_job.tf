@@ -1,6 +1,6 @@
 resource "aws_security_group" "glue_sg" {
   vpc_id = aws_vpc.main.id
-  name   = "dbt-data-vault-glue-sg"
+  name   = "${var.repo_name}-glue-sg"
 
   ingress {
     from_port = 0
@@ -19,7 +19,7 @@ resource "aws_security_group" "glue_sg" {
 
 
   tags = {
-    Name = "dbt-data-vault-glue-sg"
+    Name = "${var.repo_name}-glue-sg"
   }
 }
 
