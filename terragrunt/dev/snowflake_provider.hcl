@@ -4,6 +4,7 @@ locals {
   snowflake_user       = get_env("SNOWFLAKE_USER", "")
   snowflake_role       = get_env("SNOWFLAKE_ROLE", "")
   snowflake_privatekey = get_env("SNOWFLAKE_PRIVATE_KEY", "")
+    snowflake_warehouse = get_env("SNOWFLAKE_WAREHOUSE", "")
 }
 
 generate "snowflake_provider" {
@@ -15,8 +16,11 @@ generate "snowflake_provider" {
       account_name      = "${local.snowflake_account}"
       user              = "${local.snowflake_user}"
       role              = "${local.snowflake_role}"
+      warehouse         = "${local.snowflake_warehouse}"
       authenticator     = "SNOWFLAKE_JWT"
-      private_key       = file("${local.snowflake_privatekey}")
+      private_key       = <<KEY
+${local.snowflake_privatekey}
+KEY
       preview_features_enabled = ["snowflake_storage_integration_resource", "snowflake_stage_resource"]
     }
   EOT

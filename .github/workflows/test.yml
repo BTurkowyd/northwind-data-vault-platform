@@ -1,4 +1,4 @@
-name: Pytest ➝ Terragrunt Plan
+name: Pytest ➝ Deploy to AWS and Snowflake -> Run The Data Vault + Marts DBT Pipeline
 
 on:
   push:
@@ -16,6 +16,13 @@ permissions:
 env:
   SNOWFLAKE_EXTERNAL_ID: ${{ secrets.SNOWFLAKE_EXTERNAL_ID }}
   SNOWFLAKE_ACCOUNT_ARN: ${{ secrets.SNOWFLAKE_ACCOUNT_ARN }}
+  ATHENA_STAGING_DIR: ${{ secrets.ATHENA_STAGING_DIR }}
+  SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+  SNOWFLAKE_ACCOUNT_NAME: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+  SNOWFLAKE_ORGANIZATION_NAME: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}
+  SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+  SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+  SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
 
 jobs:
   test-and-plan:
@@ -60,15 +67,72 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: eu-central-1
 
-      - name: Run Terragrunt Init
+      - name: Run Terragrunt Init on AWS infrastructure
         run: terragrunt init
         working-directory: terragrunt/dev/aws
 
-      - name: Run Terragrunt Plan
+      - name: Run Terragrunt Plan on AWS infrastructure
         run: terragrunt plan
         working-directory: terragrunt/dev/aws
 
-      - name: Run Terragrunt Apply
+      - name: Run Terragrunt Apply on AWS infrastructure
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terragrunt apply -auto-approve
+        run: terragrunt apply -auto-approve --terragrunt-non-interactive
         working-directory: terragrunt/dev/aws
+
+      - name: Run Terragrunt Init on Snowflake infrastructure
+        run: terragrunt init
+        working-directory: terragrunt/dev/snowflake
+
+      - name: Run Terragrunt Plan on Snowflake infrastructure
+        run: terragrunt plan
+        working-directory: terragrunt/dev/snowflake
+
+      - name: Run Terragrunt Apply on Snowflake infrastructure
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terragrunt apply -auto-approve --terragrunt-non-interactive
+
+      - name: Get Glue Job Name
+        run: echo "GLUE_JOB_NAME=$(terragrunt output -raw glue_job_name)" >> $GITHUB_ENV
+        working-directory: terragrunt/dev/aws
+
+      - name: Trigger Glue Job
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          RUN_ID=$(aws glue start-job-run --job-name "$GLUE_JOB_NAME" --query 'JobRunId' --output text)
+          echo "GLUE_JOB_RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "Waiting for Glue job to complete (RunId: $RUN_ID)..."
+
+      - name: Wait for Glue Job to complete
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # Poll until job finishes
+          STATUS="RUNNING"
+          while [ "$STATUS" = "RUNNING" ] || [ "$STATUS" = "STARTING" ] || [ "$STATUS" = "STOPPING" ]; do
+            echo "Current status: $STATUS... waiting 5s"
+            sleep 5
+            STATUS=$(aws glue get-job-run --job-name "$GLUE_JOB_NAME" --run-id "$GLUE_JOB_RUN_ID" --query 'JobRun.JobRunState' --output text)
+          done
+
+          echo "Final status: $STATUS"
+
+          if [ "$STATUS" != "SUCCEEDED" ]; then
+            echo "Glue job failed with status: $STATUS"
+            exit 1
+          else
+            echo "Glue job completed successfully."
+          fi
+
+      - name: Destroy VPC endpoints (saving costs)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          terragrunt destroy -target aws_vpc_endpoint.interface_endpoints -auto-approve --terragrunt-non-interactive
+        working-directory: terragrunt/dev/aws
+
+      - name: Run Data Vault + Marts DBT Pipeline
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: make aws-dbt LOCAL=false
+
+      - name: Run Marts migration to Snowflake
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: make snowflake-dbt LOCAL=false

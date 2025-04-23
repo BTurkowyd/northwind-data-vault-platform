@@ -1,9 +1,3 @@
-{{ config(
-    materialized='incremental',
-    unique_key='hub_employee_key',
-    on_schema_change='sync_all_columns'
-) }}
-
 with order_employee as (
     select
         hub_employee_key,
