@@ -43,7 +43,7 @@ snowflake-apply:
 
 snowflake-dbt:
 	$(ENV) \
-	DBT_JSON_CATALOG="$$(< $(CATALOG_JSON))" && \
+	DBT_JSON_CATALOG="$$(cat $(CATALOG_JSON))" && \
 	export DBT_JSON_CATALOG && \
 	cd $(DBT_DIR) && \
 	dbt deps && \
