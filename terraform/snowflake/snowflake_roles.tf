@@ -30,7 +30,7 @@ resource "snowflake_grant_privileges_to_account_role" "grant_db_access" {
 
 # Grant schema usage to the role
 resource "snowflake_grant_privileges_to_account_role" "grant_schema_access" {
-  privileges        = ["MODIFY", "CREATE TABLE"]
+  privileges        = ["MODIFY", "CREATE TABLE", "USAGE"]
   account_role_name = snowflake_account_role.northwind_role.name
   on_schema {
     all_schemas_in_database = snowflake_database.my_db.name
@@ -49,14 +49,14 @@ resource "snowflake_grant_privileges_to_account_role" "grant_table_access" {
   }
 }
 
-# # Grant future table usage to the role
+# Grant future table usage to the role
 # resource "snowflake_grant_privileges_to_account_role" "grant_future_table_access" {
-#   privileges        = ["SELECT", "INSERT"]
+#   privileges        = ["SELECT", "INSERT", "UPDATE"]
 #   account_role_name = snowflake_account_role.northwind_role.name
 #   on_schema_object {
 #     future {
 #       object_type_plural = "TABLES"
-#       in_database        = snowflake_database.my_db.name
+#       in_schema       = snowflake_schema.northwind_schema.fully_qualified_name
 #     }
 #   }
 # }
