@@ -124,7 +124,7 @@ jobs:
           fi
 
       - name: Destroy VPC endpoints (saving costs)
-#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           terragrunt destroy -target aws_vpc_endpoint.interface_endpoints -auto-approve --terragrunt-non-interactive
         working-directory: terragrunt/dev/aws
