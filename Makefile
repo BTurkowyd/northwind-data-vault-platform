@@ -41,6 +41,9 @@ snowflake-plan:
 snowflake-apply:
 	$(call TG_CMD, $(SNOWFLAKE_DIR), apply)
 
+snowflake-destroy:
+	$(call TG_CMD, $(SNOWFLAKE_DIR), destroy)
+
 snowflake-dbt:
 	$(ENV) \
 	DBT_JSON_CATALOG="$$(cat $(CATALOG_JSON))" && \
