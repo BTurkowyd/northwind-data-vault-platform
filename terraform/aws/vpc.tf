@@ -108,16 +108,16 @@ locals {
   ]
 }
 
-# resource "aws_vpc_endpoint" "interface_endpoints" {
-#   for_each            = toset(local.interface_services)
-#   vpc_id              = aws_vpc.main.id
-#   service_name        = "com.amazonaws.eu-central-1.${each.key}"
-#   vpc_endpoint_type   = "Interface"
-#   subnet_ids          = [aws_subnet.public_subnet.id]
-#   private_dns_enabled = true
-#   security_group_ids  = [aws_security_group.glue_sg.id]
-#
-#   tags = {
-#     Name = "${var.repo_name}-${each.key}-vpc-endpoint"
-#   }
-# }
+resource "aws_vpc_endpoint" "interface_endpoints" {
+  for_each            = toset(local.interface_services)
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.eu-central-1.${each.key}"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [aws_subnet.public_subnet.id]
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.glue_sg.id]
+
+  tags = {
+    Name = "${var.repo_name}-${each.key}-vpc-endpoint"
+  }
+}

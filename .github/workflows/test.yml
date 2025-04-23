@@ -100,6 +100,7 @@ jobs:
 #        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           RUN_ID=$(aws glue start-job-run --job-name "$GLUE_JOB_NAME" --query 'JobRunId' --output text)
+          echo "GLUE_JOB_RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Waiting for Glue job to complete (RunId: $RUN_ID)..."
 
       - name: Wait for Glue Job to complete
@@ -110,7 +111,7 @@ jobs:
           while [ "$STATUS" = "RUNNING" ] || [ "$STATUS" = "STARTING" ] || [ "$STATUS" = "STOPPING" ]; do
             echo "Current status: $STATUS... waiting 5s"
             sleep 5
-            STATUS=$(aws glue get-job-run --job-name "$GLUE_JOB_NAME" --run-id "$RUN_ID" --query 'JobRun.JobRunState' --output text)
+            STATUS=$(aws glue get-job-run --job-name "$GLUE_JOB_NAME" --run-id "$GLUE_JOB_RUN_ID" --query 'JobRun.JobRunState' --output text)
           done
 
           echo "Final status: $STATUS"
@@ -121,6 +122,12 @@ jobs:
           else
             echo "Glue job completed successfully."
           fi
+
+      - name: Destroy VPC endpoints (saving costs)
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          terragrunt destroy -target aws_vpc_endpoint.interface_endpoints -auto-approve
+        working-directory: terragrunt/dev/aws
 
       - name: Run Data Vault + Marts DBT Pipeline
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
