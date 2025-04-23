@@ -120,6 +120,26 @@ make snowflake-apply
 ```
 
 ---
+### 🤖 CI/CD Automation (GitHub Actions)
+
+> 🚀 This entire deployment and data pipeline is **automated via GitHub Actions**.
+
+On every **push or pull request to `main`**, the following steps are executed:
+
+- ✅ Run `pytest` to validate Python code
+- ✅ Provision **AWS infrastructure** (VPC, Aurora, Glue, S3, IAM, etc.) using OpenTofu + Terragrunt
+- ✅ Provision **Snowflake objects** (database, warehouse, roles)
+- ✅ Trigger the **AWS Glue ETL** job to ingest data from Aurora to Iceberg
+- ✅ Run **dbt** to build the Data Vault layers and transform marts
+- ✅ Migrate marts to **Snowflake**
+
+🔐 **Secrets and credentials** (e.g., Snowflake private key, AWS role ARN) are managed securely using GitHub Actions secrets.
+
+📂 The full pipeline is defined in `.github/workflows/`.
+
+✅ Infrastructure changes are only _applied_ on merge to `main`.
+
+---
 ### 💾 State Management & Best Practices
 - Terraform State:
   - Stored remotely using S3 and DynamoDB to enable team collaboration and avoid state conflicts.
@@ -284,23 +304,6 @@ The aim is to ensure data accuracy, consistency, and reliability through the fol
 - **Potential improvements**
   - Add row count checks across layers (raw → vault)
   - Validate foreign key relationships between hubs, links, and satellites
-
----
-## ⚙️ Deployment & Automation
-
-Currently, this project is executed manually, but it’s designed with automation-readiness in mind.
-
-- **Manual Flow**
-  - OpenTofu/Terraform/Terragrunt for infrastructure
-  - AWS Glue console for ETL
-  - `dbt run` for transformations
-  - `dbt docs generate` for documentation
-- **Future Automation Ideas**
-  - **Orchestration** via:
-    - AWS CodePipeline
-    - AWS ECS Fargate
-  - **Triggering ETL** on schedule or based on data arrival
-
 
 ---
 ## 🌱 Roadmap
