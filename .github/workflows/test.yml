@@ -93,7 +93,7 @@ jobs:
         run: terragrunt apply -auto-approve
 
       - name: Get Glue Job Name
-        run: echo "GLUE_JOB=$(terragrunt output -raw glue_job_name)" >> $GLUE_JOB_NAME
+        run: echo "GLUE_JOB_NAME=$(terragrunt output -raw glue_job_name)" >> $GITHUB_ENV
         working-directory: terragrunt/dev/aws
 
       - name: Trigger Glue Job

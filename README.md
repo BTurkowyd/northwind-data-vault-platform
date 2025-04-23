@@ -1,5 +1,6 @@
 # Data Vault Analytics Platform with AWS Glue, Iceberg, and dbt
 ## Purpose of the Project
+![CI/CD](https://github.com/BTurkowyd/northwind-data-vault-platform/actions/workflows/test.yml/badge.svg)
 
 This project builds a modern, scalable data warehouse architecture using:
 - AWS Aurora Serverless for transactional data storage as the source system
