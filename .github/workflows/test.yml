@@ -77,7 +77,7 @@ jobs:
 
       - name: Run Terragrunt Apply on AWS infrastructure
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terragrunt apply -auto-approve --terragrunt-non-interactive
+        run: terragrunt apply -auto-approve --non-interactive
         working-directory: terragrunt/dev/aws
 
       - name: Run Terragrunt Init on Snowflake infrastructure
@@ -90,7 +90,8 @@ jobs:
 
       - name: Run Terragrunt Apply on Snowflake infrastructure
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terragrunt apply -auto-approve --terragrunt-non-interactive
+        run: terragrunt apply -auto-approve --non-interactive
+        working-directory: terragrunt/dev/snowflake
 
       - name: Get Glue Job Name
         run: echo "GLUE_JOB_NAME=$(terragrunt output -raw glue_job_name)" >> $GITHUB_ENV
@@ -126,7 +127,7 @@ jobs:
       - name: Destroy VPC endpoints (saving costs)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          terragrunt destroy -target aws_vpc_endpoint.interface_endpoints -auto-approve --terragrunt-non-interactive
+          terragrunt destroy -target aws_vpc_endpoint.interface_endpoints -auto-approve --non-interactive
         working-directory: terragrunt/dev/aws
 
       - name: Run Data Vault + Marts DBT Pipeline
