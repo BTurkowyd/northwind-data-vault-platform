@@ -92,7 +92,35 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terragrunt apply -auto-approve
 
-        # todo: the Glue job is not working yet!!!
+      - name: Get Glue Job Name
+        run: echo "GLUE_JOB=$(terragrunt output -raw glue_job_name)" >> "$GLUE_JOB_NAME"
+        working-directory: terragrunt/dev/aws
+
+      - name: Trigger Glue Job
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          RUN_ID=$(aws glue start-job-run --job-name "$GLUE_JOB_NAME" --query 'JobRunId' --output text)
+          echo "Waiting for Glue job to complete (RunId: $RUN_ID)..."
+
+      - name: Wait for Glue Job to complete
+#        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # Poll until job finishes
+          STATUS="RUNNING"
+          while [ "$STATUS" = "RUNNING" ] || [ "$STATUS" = "STARTING" ] || [ "$STATUS" = "STOPPING" ]; do
+            echo "Current status: $STATUS... waiting 5s"
+            sleep 5
+            STATUS=$(aws glue get-job-run --job-name "$GLUE_JOB_NAME" --run-id "$RUN_ID" --query 'JobRun.JobRunState' --output text)
+          done
+
+          echo "Final status: $STATUS"
+
+          if [ "$STATUS" != "SUCCEEDED" ]; then
+            echo "Glue job failed with status: $STATUS"
+            exit 1
+          else
+            echo "Glue job completed successfully."
+          fi
 
       - name: Run Data Vault + Marts DBT Pipeline
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
