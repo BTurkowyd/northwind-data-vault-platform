@@ -56,7 +56,7 @@ SNOWFLAKE_ACCOUNT_NAME="a Snowflake account name"
 SNOWFLAKE_USER="a Snowflake user name"
 SNOWFLAKE_ROLE="a Snowflake role name"
 SNOWFLAKE_WAREHOUSE="A warehouse to be used"
-SNOWFLAKE_PRIVATE_KEY="a path to the Snowflake private SSH key"
+SNOWFLAKE_PRIVATE_KEY="Snowflake private SSH key"
 ```
 
 🧭 **Region:** This project is configured for the `eu-central-1` region by default.
