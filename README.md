@@ -55,6 +55,7 @@ SNOWFLAKE_ORGANIZATION_NAME="a Snowflake organization name"
 SNOWFLAKE_ACCOUNT_NAME="a Snowflake account name"
 SNOWFLAKE_USER="a Snowflake user name"
 SNOWFLAKE_ROLE="a Snowflake role name"
+SNOWFLAKE_WAREHOUSE="A warehouse to be used"
 SNOWFLAKE_PRIVATE_KEY="a path to the Snowflake private SSH key"
 ```
 
@@ -268,7 +269,7 @@ dbt_snowflake_profile:
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       authenticator: snowflake_jwt
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      private_key: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
       database: NORTHWIND_DB_DEV
       warehouse: NORTHWIND_WH_DEV
       schema: NORTHWIND_SCHEMA_DEV
@@ -313,4 +314,3 @@ Here's what could be explored next:
 
 - [ ] **Point-In-Time (PIT) Tables** for snapshot-style historical joins
 - [ ] **Bridge Tables** for many-to-many relationships (e.g. products in orders)
-- [ ] **Automated data loading** into Aurora via CDC or batch ingestion
