@@ -5,7 +5,7 @@ resource "snowflake_account_role" "northwind_role" {
 
 resource "snowflake_grant_account_role" "grant_northwind_role" {
   role_name        = snowflake_account_role.northwind_role.name
-  parent_role_name = "ACCOUNTADMIN"
+  parent_role_name = "TERRAGRUNT_ROLE"
 }
 
 # Grant warehouse usage to the role
@@ -28,6 +28,14 @@ resource "snowflake_grant_privileges_to_account_role" "grant_db_access" {
   }
 }
 
+resource "snowflake_grant_privileges_to_account_role" "grant_schema_usage" {
+  privileges        = ["USAGE"]
+  account_role_name = snowflake_account_role.northwind_role.name
+  on_schema {
+    schema_name = snowflake_schema.northwind_schema.fully_qualified_name
+  }
+}
+
 # Grant schema usage to the role
 resource "snowflake_grant_privileges_to_account_role" "grant_schema_access" {
   privileges        = ["MODIFY", "CREATE TABLE", "USAGE"]
@@ -44,19 +52,19 @@ resource "snowflake_grant_privileges_to_account_role" "grant_table_access" {
   on_schema_object {
     all {
       object_type_plural = "TABLES"
-      in_database        = snowflake_database.my_db.name
+      in_schema          = snowflake_schema.northwind_schema.fully_qualified_name
     }
   }
 }
 
 # Grant future table usage to the role
-# resource "snowflake_grant_privileges_to_account_role" "grant_future_table_access" {
-#   privileges        = ["SELECT", "INSERT", "UPDATE"]
-#   account_role_name = snowflake_account_role.northwind_role.name
-#   on_schema_object {
-#     future {
-#       object_type_plural = "TABLES"
-#       in_schema       = snowflake_schema.northwind_schema.fully_qualified_name
-#     }
-#   }
-# }
+resource "snowflake_grant_privileges_to_account_role" "grant_future_table_access" {
+  privileges        = ["SELECT", "INSERT", "UPDATE"]
+  account_role_name = snowflake_account_role.northwind_role.name
+  on_schema_object {
+    future {
+      object_type_plural = "TABLES"
+      in_schema          = snowflake_schema.northwind_schema.fully_qualified_name
+    }
+  }
+}
