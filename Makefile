@@ -31,6 +31,14 @@ aws-dbt:
  	dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
 	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
+aws-dbt-docs:
+	$(ENV) cd $(DBT_DIR) && \
+	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
+
+aws-dbt-docs-serve:
+	$(ENV) cd $(DBT_DIR) && \
+	dbt docs serve --profile northwind_dbt --target dev --profiles-dir ./.dbt
+
 # Snowflake
 snowflake-init:
 	$(call TG_CMD, $(SNOWFLAKE_DIR), init)
