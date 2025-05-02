@@ -1,15 +1,3 @@
-northwind_dbt:
-  target: dev
-  outputs:
-    dev:
-      type: athena
-      s3_staging_dir: "{{ env_var('ATHENA_STAGING_DIR') }}"
-      region_name: eu-central-1
-      database: awsdatacatalog
-      schema: northwind_data_vault
-      work_group: primary
-      profile_name: cdk-dev
-
 snowflake_profile:
   target: dev
   outputs:

@@ -1,0 +1,56 @@
+name: 'northwind_dbt'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'northwind_dbt'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+vars:
+  dbt_project_name: "northwind_dbt"
+  dbt_project_version: "1.0.0"
+  record_source: "aurora-postgres"
+
+models:
+  northwind_dbt:
+    staging:
+      +materialized: view
+      +docs:
+          show: true
+          node_color: "#0581ed"
+    data_vault:
+      +materialized: incremental
+      +table_type: iceberg
+      +format: parquet
+      +incremental_strategy: merge
+      hubs:
+        +docs:
+          show: true
+          node_color: "#02cc67"
+      satellites:
+        +docs:
+          show: true
+          node_color: "#8fcc02"
+      links:
+        +docs:
+          show: true
+          node_color: "#f0cc62"
+    marts:
+      +materialized: table
+      +table_type: iceberg
+      +format: parquet
+      +docs:
+          show: true
+          node_color: "#ffa07d"
