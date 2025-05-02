@@ -287,8 +287,8 @@ dbt docs serve           # view documentation
 
 For the convenience of running dbt commands, you can use the Makefile in the root directory:
 ```bash
-make aws-dbt # runs dbt on AWS Athena to build the models (data vault and marts)
-make snowflake-dbt # migrates marts to Snowflake (creates external and materialized tables)
+make aws-dbt # runs dbt on AWS Athena to build the models (data vault and marts_snowflake)
+make snowflake-dbt # migrates marts_snowflake to Snowflake (creates external and materialized tables)
 ```
 
 

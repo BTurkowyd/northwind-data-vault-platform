@@ -1,5 +1,13 @@
 version: 2
 
+sources:
+  - name: external_tables
+    database: NORTHWIND_DB_DEV
+    schema: NORTHWIND_SCHEMA_DEV
+    tables:
+      - name: mart_sales_external
+        description: "External table created from S3"
+
 models:
   - name: mart_sales
     description: |

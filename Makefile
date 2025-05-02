@@ -29,11 +29,11 @@ aws-dbt:
 	$(ENV) cd $(DBT_DIR) && \
  	dbt deps && \
  	dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
-	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
+	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt --select path:models/aws/
 
 aws-dbt-docs:
 	$(ENV) cd $(DBT_DIR) && \
-	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
+	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt --select path:models/aws
 
 aws-dbt-docs-serve:
 	$(ENV) cd $(DBT_DIR) && \
@@ -58,6 +58,6 @@ snowflake-dbt:
 	export DBT_JSON_CATALOG && \
 	cd $(DBT_DIR) && \
 	dbt deps && \
-	dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt
+	dbt run --profile snowflake_profile --target dev --profiles-dir ./.dbt --select path:models/snowflake
 
 .PHONY: aws-init aws-plan aws-apply aws-dbt snowflake-init snowflake-plan snowflake-apply snowflake-dbt
