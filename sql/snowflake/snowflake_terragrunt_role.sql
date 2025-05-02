@@ -40,3 +40,7 @@ USE ROLE terragrunt_role;
 GRANT SELECT, INSERT, UPDATE
   ON FUTURE TABLES IN SCHEMA NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV
   TO ROLE northwind_role_dev;
+
+-- Optionally grant privileges so dbt can apply them
+GRANT APPLY ON TAG "pii" TO ROLE terragrunt_role;
+GRANT APPLY ON TAG "sensitivity" TO ROLE terragrunt_role;
