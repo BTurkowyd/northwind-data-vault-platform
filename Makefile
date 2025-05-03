@@ -59,7 +59,6 @@ snowflake-dbt:
 	export DBT_JSON_CATALOG && \
 	cd $(DBT_SNOWFLAKE_DIR) && \
 	dbt deps && \
-	dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt && \
-	dbt run --profile snowflake_profile --target dev --profiles-dir ./.dbt
+	dbt run-operation apply_column_tags_for_all_models --profile snowflake_profile --target dev --profiles-dir ./.dbt
 
 .PHONY: aws-init aws-plan aws-apply aws-dbt snowflake-init snowflake-plan snowflake-apply snowflake-dbt
