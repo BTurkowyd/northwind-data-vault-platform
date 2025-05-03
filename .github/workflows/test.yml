@@ -45,7 +45,7 @@ jobs:
         run: uv sync --dev
 
       - name: Run Pytest
-        run: pytest
+        run: uv venv exec pytest
 
       - name: Check AWS CLI version
         run: aws --version
