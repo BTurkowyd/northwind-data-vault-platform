@@ -104,6 +104,8 @@ This project provisions the following infrastructure using OpenTofu/Terraform + 
   - Compute resources for running queries.
 - **Snowflake Roles and Permissions**
   - Roles for data ingestion, transformation, and querying.
+- **Tags and Masking Policies**
+  - For data governance and security.
 
 ---
 
@@ -148,7 +150,7 @@ On every **push or pull request to `main`**, the following steps are executed:
   (You can customize this if you use a different backend setup.)
 - Cost Control Tips:
   - Services like AWS Glue, Aurora, and NAT Gateway can be costly.
-  E.g., notice that VPC Endpoints in `terraform/vpc.tf` are commented out to destroy them when not used, to save costs.
+  E.g., notice that VPC Endpoints in `terraform/vpc.tf` are destroyed at the end of the CI/CD pipeline, to save costs.
   - Use Aurora Serverless v2, minimal worker types for Glue, and enable auto-pause where possible.
   - Clean up dev/test environments when idle to avoid unexpected charges.
 - Infrastructure Change Workflow:
@@ -222,7 +224,6 @@ This project uses standard Data Vault layers:
 ---
 ### 🧠 Data Vault Features Implemented
 
-- **Incremental materializations** – Improve performance and reduce cost by only processing new or changed records.
 - **Hashdiff tracking in satellites** – Enables Slowly Changing Dimension (SCD) Type 2 behavior by tracking historical changes.
 - **Surrogate keys** – Simplify joins, enable deduplication, and enforce uniqueness across hubs, links, and satellites.
 
@@ -239,15 +240,12 @@ This project uses standard Data Vault layers:
 Before running dbt, ensure you have Python dependencies installed. Use the `uv` environment to manage Python packages:
 ```bash
 cd root_repo_directory
-uv venv .venv
-source .venv/bin/activate
-uv pip install -r requirements.txt # without developer packages
-# OR
-uv pip install -r requirements-dev.txt # with developer packages
+uv sync # optionally uv sync --dev to install dev dependencies
 ```
-Then, set up your dbt profile. Update the `./northwind_dbt/dbt/profile.yml` file with the following content:
+Then, set up dbt profiles. Update the `./northwind_dbt/aws | snowflake/.dbt/profiles.yaml` file with the following content:
 
 ```yaml
+# ./northwind_dbt/aws/.dbt/profiles.yml
 dbt_aws_profile:
   target: dev
   outputs:
@@ -260,6 +258,7 @@ dbt_aws_profile:
       work_group: primary
       profile_name: aws_iam_user_name
 
+# ./northwind_dbt/snowflake/.dbt/profiles.yml
 dbt_snowflake_profile:
   target: dev
   outputs:
@@ -275,7 +274,7 @@ dbt_snowflake_profile:
       schema: NORTHWIND_SCHEMA_DEV
 ```
 
-Install dbt dependencies and run the models:
+Install dbt dependencies and run the models manually:
 
 ```bash
 dbt deps        # installs dbt_utils
@@ -288,10 +287,9 @@ dbt docs serve           # view documentation
 
 For the convenience of running dbt commands, you can use the Makefile in the root directory:
 ```bash
-make aws-dbt # runs dbt on AWS Athena to build the models (data vault and marts)
-make snowflake-dbt # migrates marts to Snowflake (creates external and materialized tables)
+make aws-dbt # runs dbt on AWS Athena to build the models (data vault and marts_snowflake)
+make snowflake-dbt # migrates marts_snowflake to Snowflake (creates external and materialized tables)
 ```
-
 
 ---
 ## Future Enhancements & Roadmap

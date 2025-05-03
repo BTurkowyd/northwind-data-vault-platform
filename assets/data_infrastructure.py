@@ -31,7 +31,7 @@ with Diagram(
     ):  # light green
         data_vault = [Storage("hubs"), Storage("links"), Storage("satellites")]
 
-    dbt_marts = Custom("dbt / marts", "./dbt_icon.png")
+    dbt_marts = Custom("dbt / marts_snowflake", "./dbt_icon.png")
 
     with Cluster(
         "Gold: Marts (Iceberg)", graph_attr={"bgcolor": "#FFF3E0"}

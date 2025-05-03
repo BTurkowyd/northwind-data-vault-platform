@@ -5,3 +5,4 @@
 /logs/
 .idea/
 **/.user.yml
+**/__pycache__/

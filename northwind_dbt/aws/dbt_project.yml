@@ -27,15 +27,30 @@ models:
   northwind_dbt:
     staging:
       +materialized: view
+      +docs:
+          show: true
+          node_color: "#0581ed"
     data_vault:
       +materialized: incremental
       +table_type: iceberg
       +format: parquet
       +incremental_strategy: merge
-      hubs: {}
-      satellites: {}
-      links: {}
+      hubs:
+        +docs:
+          show: true
+          node_color: "#02cc67"
+      satellites:
+        +docs:
+          show: true
+          node_color: "#8fcc02"
+      links:
+        +docs:
+          show: true
+          node_color: "#f0cc62"
     marts:
       +materialized: table
       +table_type: iceberg
       +format: parquet
+      +docs:
+          show: true
+          node_color: "#ffa07d"

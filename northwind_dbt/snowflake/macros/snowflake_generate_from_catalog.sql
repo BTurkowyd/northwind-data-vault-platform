@@ -41,16 +41,6 @@
       {{ run_query(create_external_table.strip()) }}
       {{ run_query('ALTER EXTERNAL TABLE ' ~ external_table_name ~ ' REFRESH') }}
 
-      {# Create materialized table from external one #}
-      {% set materialize_table %}
-        CREATE OR REPLACE TABLE {{ materialized_table_name }} AS
-        SELECT * FROM {{ external_table_name }};
-        ALTER TABLE {{ materialized_table_name }} DROP COLUMN value;
-      {% endset %}
-
-      {{ log("Materializing table: " ~ materialized_table_name, info=True) }}
-      {{ run_query(materialize_table.strip()) }}
-
     {% else %}
       {{ log("Skipping table: " ~ table_name, info=True) }}
     {% endif %}

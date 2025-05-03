@@ -42,10 +42,10 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Install dev dependencies with uv
-        run: uv pip install --system -r requirements-dev.txt
+        run: uv sync --dev
 
       - name: Run Pytest
-        run: pytest
+        run: uv run pytest
 
       - name: Check AWS CLI version
         run: aws --version
