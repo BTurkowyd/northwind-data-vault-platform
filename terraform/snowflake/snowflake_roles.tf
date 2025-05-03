@@ -3,6 +3,21 @@ resource "snowflake_account_role" "northwind_role" {
   comment = "A role to use for the Northwind database"
 }
 
+resource "snowflake_account_role" "low_sensitivity_role" {
+  name    = "LOW_SENSITIVITY_ROLE_${upper(var.stage)}"
+  comment = "A role to use for low sensitivity data"
+}
+
+resource "snowflake_account_role" "high_sensitivity_role" {
+  name    = "HIGH_SENSITIVITY_ROLE_${upper(var.stage)}"
+  comment = "A role to use for high sensitivity data"
+}
+
+resource "snowflake_account_role" "critical_sensitivity_role" {
+  name    = "CRITICAL_SENSITIVITY_ROLE_${upper(var.stage)}"
+  comment = "A role to use for critical sensitivity data"
+}
+
 resource "snowflake_grant_account_role" "grant_northwind_role" {
   role_name        = snowflake_account_role.northwind_role.name
   parent_role_name = "TERRAGRUNT_ROLE"
