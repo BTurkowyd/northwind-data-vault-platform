@@ -28,17 +28,17 @@ aws-apply:
 
 aws-dbt:
 	$(ENV) cd $(DBT_AWS_DIR) && \
- 	dbt deps && \
- 	dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
-	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
+ 	uv run dbt deps && \
+ 	uv run dbt run --fail-fast --profile northwind_dbt --target dev --profiles-dir ./.dbt && \
+	uv run dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
 aws-dbt-docs:
 	$(ENV) cd $(DBT_AWS_DIR) && \
-	dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
+	uv run dbt docs generate --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
 aws-dbt-docs-serve:
 	$(ENV) cd $(DBT_AWS_DIR) && \
-	dbt docs serve --profile northwind_dbt --target dev --profiles-dir ./.dbt
+	uv run dbt docs serve --profile northwind_dbt --target dev --profiles-dir ./.dbt
 
 # Snowflake
 snowflake-init:
@@ -58,9 +58,9 @@ snowflake-dbt:
 	DBT_JSON_CATALOG="$$(cat $(CATALOG_JSON))" && \
 	export DBT_JSON_CATALOG && \
 	cd $(DBT_SNOWFLAKE_DIR) && \
-	dbt deps && \
-	dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt && \
-	dbt run --profile snowflake_profile --target dev --profiles-dir ./.dbt && \
-	dbt run-operation apply_column_tags_for_all_models --profile snowflake_profile --target dev --profiles-dir ./.dbt
+	uv run dbt deps && \
+	uv run dbt run-operation snowflake_generate_from_catalog --profile snowflake_profile --target dev --profiles-dir ./.dbt && \
+	uv run dbt run --profile snowflake_profile --target dev --profiles-dir ./.dbt && \
+	uv run dbt run-operation apply_column_tags_for_all_models --profile snowflake_profile --target dev --profiles-dir ./.dbt
 
 .PHONY: aws-init aws-plan aws-apply aws-dbt snowflake-init snowflake-plan snowflake-apply snowflake-dbt
