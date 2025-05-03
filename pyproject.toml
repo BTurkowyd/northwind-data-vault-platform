@@ -1,0 +1,16 @@
+[project]
+name = "dbt-data-vault"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dbt-athena-community==1.9.2",
+    "dbt-snowflake==1.9.2",
+    "diagrams>=0.2.4 ; python_full_version >= '3.12'",
+    "pre-commit>=4.2.0 ; python_full_version >= '3.12'",
+    "pyspark==3.5.5",
+    "pytest>=8.3.5",
+    "sqlfluff>=3.4.0",
+    "sqlfluff-templater-dbt>=3.4.0",
+]
