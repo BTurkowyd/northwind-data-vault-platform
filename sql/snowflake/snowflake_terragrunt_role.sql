@@ -16,6 +16,7 @@ GRANT ROLE terragrunt_role TO USER github_ci_user;
 
 -- Usage and object-level privileges (with grant option)
 GRANT USAGE, MODIFY, MONITOR ON DATABASE NORTHWIND_DB_DEV TO ROLE terragrunt_role WITH GRANT OPTION;
+GRANT USAGE ON SCHEMA NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV TO ROLE terragrunt_role;
 GRANT ALL PRIVILEGES ON SCHEMA NORTHWIND_DB_DEV.NORTHWIND_SCHEMA_DEV TO ROLE terragrunt_role WITH GRANT OPTION;
 
 -- External integrations access
