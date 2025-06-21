@@ -1,12 +1,15 @@
+-- This satellite table captures the attributes of suppliers in the Northwind database.
 {{ config(
     unique_key='sat_supplier_key',
     merge_update_columns=['hashdiff', 'load_ts', 'company_name', 'contact_name', 'contact_title', 'address', 'city', 'region', 'postal_code', 'country', 'phone', 'fax', 'homepage', 'record_source']
 ) }}
 
+-- The satellite table is built from the staging model 'stg_suppliers'.
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_suppliers') }}
 ),
 
+-- The hub table for suppliers is referenced to get the hub keys.
 hub_keys AS (
     SELECT
         supplier_id,
@@ -14,6 +17,7 @@ hub_keys AS (
     FROM {{ ref('hub_suppliers') }}
 ),
 
+-- The satellite table is constructed by joining the source data with the hub keys.
 prepared AS (
     SELECT
         sd.*,
@@ -27,6 +31,7 @@ prepared AS (
     INNER JOIN hub_keys AS hk ON sd.supplier_id = hk.supplier_id
 )
 
+-- Final selection of attributes for the satellite table.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['hub_supplier_key', 'hashdiff']) }} AS sat_supplier_key,
     hub_supplier_key,

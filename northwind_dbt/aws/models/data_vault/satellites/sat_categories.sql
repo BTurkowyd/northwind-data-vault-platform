@@ -1,14 +1,15 @@
+-- This satellite table captures the attributes of categories in the Northwind database.
 {{ config(
     unique_key='sat_category_key',
     merge_update_columns=['hashdiff', 'category_name', 'description', 'picture', 'load_ts', 'record_source']
 ) }}
 
--- The source data
+-- The satellite table is built from the staging model 'stg_categories'.
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_categories') }}
 ),
 
--- The hub keys
+-- The hub table for categories is referenced to get the hub keys.
 hub_keys AS (
     SELECT
         category_id,
@@ -16,6 +17,7 @@ hub_keys AS (
     FROM {{ ref('hub_categories') }}
 )
 
+-- The satellite table is constructed by joining the source data with the hub keys.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['hk.hub_category_key', 'sd.hashdiff']) }} AS sat_category_key,
     hk.hub_category_key,

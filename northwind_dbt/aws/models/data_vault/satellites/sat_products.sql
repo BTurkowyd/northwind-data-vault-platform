@@ -1,12 +1,15 @@
+-- This satellite table captures the attributes of products in the Northwind database.
 {{ config(
     unique_key='sat_product_key',
     merge_update_columns=['hashdiff', 'load_ts', 'product_name', 'quantity_per_unit', 'unit_price', 'units_in_stock', 'units_on_order', 'reorder_level', 'discontinued', 'record_source']
 ) }}
 
+-- The satellite table is built from the staging model 'stg_products'.
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_products') }}
 ),
 
+-- The hub table for products is referenced to get the hub keys.
 hub_products AS (
     SELECT
         product_id,
@@ -14,6 +17,7 @@ hub_products AS (
     FROM {{ ref('hub_products') }}
 ),
 
+-- The satellite table is constructed by joining the source data with the hub keys.
 prepared AS (
     SELECT
         sd.*,
@@ -31,6 +35,7 @@ prepared AS (
     INNER JOIN hub_products AS hp ON sd.product_id = hp.product_id
 )
 
+-- Final selection of attributes for the satellite table.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['hub_product_key', 'hashdiff']) }} AS sat_product_key,
     hub_product_key,

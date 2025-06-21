@@ -1,12 +1,15 @@
+-- This satellite table captures the attributes of US states in the Northwind database.
 {{ config(
     unique_key='sat_state_key',
     merge_update_columns=['hashdiff', 'load_ts', 'state_name', 'state_abbr', 'state_region', 'record_source']
 ) }}
 
+-- The satellite table is built from the staging model 'stg_us_states'.
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_us_states') }}
 ),
 
+-- The hub table for US states is referenced to get the hub keys.
 hub_keys AS (
     SELECT
         state_id,
@@ -14,6 +17,7 @@ hub_keys AS (
     FROM {{ ref('hub_us_states') }}
 ),
 
+-- The satellite table is constructed by joining the source data with the hub keys.
 prepared AS (
     SELECT
         sd.*,
@@ -23,6 +27,7 @@ prepared AS (
     INNER JOIN hub_keys AS hk ON sd.state_id = hk.state_id
 )
 
+-- Final selection of attributes for the satellite table.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['hub_state_key', 'hashdiff']) }} AS sat_state_key,
     hub_state_key,

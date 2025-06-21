@@ -1,3 +1,4 @@
+-- This satellite table captures the attributes of employees in the Northwind database.
 {{ config(
     unique_key='sat_employee_key',
     merge_update_columns=[
@@ -7,10 +8,12 @@
     ]
 ) }}
 
+-- The satellite table is built from the staging model 'stg_employees'.
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_employees') }}
 ),
 
+-- The hub table for employees is referenced to get the hub keys.
 hub_keys AS (
     SELECT
         employee_id,
@@ -18,6 +21,7 @@ hub_keys AS (
     FROM {{ ref('hub_employees') }}
 ),
 
+-- The satellite table is constructed by joining the source data with the hub keys.
 prepared AS (
     SELECT
         sd.*,
@@ -44,6 +48,7 @@ prepared AS (
     INNER JOIN hub_keys AS hk ON sd.employee_id = hk.employee_id
 )
 
+-- Final selection of attributes for the satellite table.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['hub_employee_key', 'hashdiff']) }} AS sat_employee_key,
     hub_employee_key,
