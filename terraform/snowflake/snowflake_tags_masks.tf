@@ -1,3 +1,4 @@
+# Tag for marking columns as PII (personally identifiable information)
 resource "snowflake_tag" "pii" {
   name           = "pii"
   database       = snowflake_database.my_db.name
@@ -6,6 +7,7 @@ resource "snowflake_tag" "pii" {
   allowed_values = ["true", "false"]
 }
 
+# Tag for marking column sensitivity (low, high, critical) and linking masking policies
 resource "snowflake_tag" "sensitivity" {
   name           = "sensitivity"
   database       = snowflake_database.my_db.name
@@ -18,6 +20,7 @@ resource "snowflake_tag" "sensitivity" {
   ]
 }
 
+# Masking policy for VARCHAR columns based on sensitivity and user role
 resource "snowflake_masking_policy" "redact_varchar_sensitivity" {
   name     = "REDACT_VARCHAR_SENSITIVITY"
   database = snowflake_database.my_db.name
@@ -41,6 +44,7 @@ resource "snowflake_masking_policy" "redact_varchar_sensitivity" {
   return_data_type = "VARCHAR"
 }
 
+# Masking policy for NUMBER columns based on sensitivity and user role
 resource "snowflake_masking_policy" "redact_number_sensitivity" {
   name     = "REDACT_NUMBER_SENSITIVITY"
   database = snowflake_database.my_db.name

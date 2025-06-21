@@ -1,3 +1,4 @@
+# Provision a Snowflake virtual warehouse for compute
 resource "snowflake_warehouse" "northwind_wh" {
   name                = "NORTHWIND_WH_${var.stage}"
   warehouse_size      = "XSMALL"

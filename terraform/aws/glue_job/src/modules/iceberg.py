@@ -15,11 +15,13 @@ def write_to_iceberg(spark: SparkSession, df: DataFrame, table_name: str, db: st
     """
     identifier_pattern = r"^[A-Za-z_][A-Za-z0-9_]*$"
 
+    # Validate table and database names for Iceberg compatibility
     if not table_name or not re.match(identifier_pattern, table_name):
         raise ValueError(f"Invalid table name: '{table_name}'")
     if not db or not re.match(identifier_pattern, db):
         raise ValueError(f"Invalid database name: '{db}'")
 
+    # Register DataFrame as a temporary view and write to Iceberg table
     df.createOrReplaceTempView(f"tmp_{table_name}")
     spark.sql(
         f"""

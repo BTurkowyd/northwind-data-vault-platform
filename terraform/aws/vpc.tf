@@ -1,4 +1,4 @@
-# Create a VPC
+# Main VPC for the environment
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -9,7 +9,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Create Subnets (Aurora requires at least 2, both are private)
+# Private subnets for Aurora (Multi-AZ)
 resource "aws_subnet" "subnet1" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
@@ -32,7 +32,7 @@ resource "aws_subnet" "subnet2" {
   }
 }
 
-# Route Table
+# Private route table for private subnets
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main.id
 }
@@ -47,7 +47,7 @@ resource "aws_route_table_association" "subnet2" {
   route_table_id = aws_route_table.private_rt.id
 }
 
-# Public subnet (for Bastion Host)
+# Public subnet for Bastion Host or Glue jobs
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.3.0/24"
@@ -59,7 +59,7 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
-# Internet Gateway
+# Internet Gateway for public subnet
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -68,8 +68,7 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-
-# Route Table for Public Subnet
+# Route table for public subnet
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
 }
@@ -85,6 +84,7 @@ resource "aws_route_table_association" "public_subnet" {
   route_table_id = aws_route_table.public_rt.id
 }
 
+# S3 VPC endpoint for private and public subnets (for Glue, Athena, etc.)
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.main.id
   service_name      = "com.amazonaws.eu-central-1.s3"
@@ -100,6 +100,7 @@ resource "aws_vpc_endpoint" "s3" {
   }
 }
 
+# Interface VPC endpoints for AWS services (e.g., Glue, Secrets Manager)
 locals {
   interface_services = [
     "secretsmanager",

@@ -10,6 +10,7 @@ from pyspark.sql import Row
 from modules.jdbc import get_jdbc_options, fetch_table_names, load_table_as_df
 
 
+# Fixture for secrets dictionary
 @pytest.fixture
 def secrets():
     return {
@@ -21,6 +22,7 @@ def secrets():
     }
 
 
+# Fixture for expected JDBC options
 @pytest.fixture
 def jdbc_options():
     return {
@@ -68,6 +70,7 @@ def test_fetch_table_names_returns_expected_list(jdbc_options):
 
 
 def test_fetch_table_names_returns_empty_list_on_no_tables(jdbc_options):
+    """Test that fetch_table_names returns an empty list if there are no tables."""
     mock_spark = MagicMock()
     mock_df = MagicMock()
     mock_df.collect.return_value = []
@@ -82,6 +85,7 @@ def test_fetch_table_names_returns_empty_list_on_no_tables(jdbc_options):
 
 
 def test_fetch_table_names_propagates_spark_error(jdbc_options):
+    """Test that fetch_table_names propagates Spark errors."""
     mock_spark = MagicMock()
     reader = MagicMock()
     reader.options.return_value.load.side_effect = Exception("Spark read failed")
@@ -91,6 +95,7 @@ def test_fetch_table_names_propagates_spark_error(jdbc_options):
 
 
 def test_fetch_table_names_ignores_unexpected_columns(jdbc_options):
+    """Test that fetch_table_names ignores unexpected columns in the result."""
     mock_spark = MagicMock()
     mock_df = MagicMock()
     mock_df.collect.return_value = [Row(table_name="abc", other="should_ignore")]
@@ -105,6 +110,7 @@ def test_fetch_table_names_ignores_unexpected_columns(jdbc_options):
 
 
 def test_load_table_as_df_returns_dataframe(jdbc_options):
+    """Test that load_table_as_df returns a DataFrame for a valid table name."""
     mock_spark = MagicMock()
     mock_df = MagicMock()
 
@@ -127,6 +133,7 @@ def test_load_table_as_df_returns_dataframe(jdbc_options):
     "bad_name", ["", "   ", "123table", "invalid-char!", "name.with.dot"]
 )
 def test_invalid_table_name_raises(jdbc_options, bad_name):
+    """Test that invalid table names raise ValueError."""
     mock_spark = MagicMock()
 
     with pytest.raises(ValueError, match=f"Invalid table name: '{bad_name}'"):
@@ -134,6 +141,7 @@ def test_invalid_table_name_raises(jdbc_options, bad_name):
 
 
 def test_load_table_as_df_propagates_spark_error(jdbc_options):
+    """Test that load_table_as_df propagates Spark errors."""
     mock_spark = MagicMock()
     reader = MagicMock()
     reader.options.return_value.load.side_effect = RuntimeError("spark read fail")

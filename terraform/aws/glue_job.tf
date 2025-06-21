@@ -2,6 +2,7 @@ resource "aws_security_group" "glue_sg" {
   vpc_id = aws_vpc.main.id
   name   = "${var.repo_name}-glue-sg"
 
+  # Allow all TCP traffic within the security group (self-referencing)
   ingress {
     from_port = 0
     to_port   = 65535
@@ -9,6 +10,7 @@ resource "aws_security_group" "glue_sg" {
     self      = true
   }
 
+  # Allow all outbound traffic
   egress {
     from_port        = 0
     to_port          = 0
@@ -17,12 +19,12 @@ resource "aws_security_group" "glue_sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-
   tags = {
     Name = "${var.repo_name}-glue-sg"
   }
 }
 
+# Glue job module for Northwind ETL
 module "northwind_glue_job" {
   source                        = "./glue_job"
   aurora_cluster                = module.northwind.aurora_cluster

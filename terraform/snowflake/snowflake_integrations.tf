@@ -1,3 +1,4 @@
+# Storage integration for Snowflake to access S3 (Iceberg tables)
 resource "snowflake_storage_integration" "s3_integration" {
   name             = "S3_INTEGRATION_${var.stage}"
   storage_provider = "S3"
@@ -8,6 +9,7 @@ resource "snowflake_storage_integration" "s3_integration" {
   storage_aws_role_arn = var.snowflake_integration_iam_role
 }
 
+# External stage in Snowflake pointing to S3 for Iceberg tables
 resource "snowflake_stage" "s3_stage" {
   name                = "S3_STAGE_${var.stage}"
   directory           = "ENABLE = true"
