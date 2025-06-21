@@ -3,7 +3,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   cluster_identifier     = "${var.name}-aurora-cluster"
   engine                 = "aurora-postgresql"
   engine_mode            = "provisioned"
-  engine_version         = "16.3"
+  engine_version         = "16.6"
   enable_http_endpoint   = true
   database_name          = var.database_name
   master_username        = "master"
@@ -33,6 +33,9 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   instance_class     = "db.serverless"
   engine             = "aurora-postgresql"
   engine_version     = aws_rds_cluster.aurora_cluster.engine_version
+
+  # Prevent automatic minor version upgrades
+  auto_minor_version_upgrade = false
 
   tags = {
     Name = "${var.name}-aurora-instance"
