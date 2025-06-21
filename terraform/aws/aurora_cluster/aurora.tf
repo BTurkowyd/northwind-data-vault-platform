@@ -1,4 +1,4 @@
-# Aurora Serverless Cluster
+# Aurora Serverless PostgreSQL Cluster definition
 resource "aws_rds_cluster" "aurora_cluster" {
   cluster_identifier     = "${var.name}-aurora-cluster"
   engine                 = "aurora-postgresql"
@@ -14,6 +14,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   vpc_security_group_ids = var.sg_ids
   db_subnet_group_name   = var.db_subnet_group_name
 
+  # Serverless v2 scaling configuration
   serverlessv2_scaling_configuration {
     min_capacity             = var.min_capacity
     max_capacity             = var.max_capacity
@@ -25,7 +26,7 @@ resource "aws_rds_cluster" "aurora_cluster" {
   }
 }
 
-# Aurora DB Instance (Required for the Cluster)
+# Aurora DB Instance (required for the cluster to be operational)
 resource "aws_rds_cluster_instance" "aurora_instance" {
   cluster_identifier = aws_rds_cluster.aurora_cluster.id
   identifier         = "${var.name}-aurora-instance"

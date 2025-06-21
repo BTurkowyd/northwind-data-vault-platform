@@ -1,7 +1,9 @@
+# Store Aurora credentials and connection info in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "aurora_secret" {
   name = "${var.name}-aurora-secret"
 }
 
+# Store the actual secret value (host, port, dbname, username, password)
 resource "aws_secretsmanager_secret_version" "aurora_secret_version" {
   secret_id = aws_secretsmanager_secret.aurora_secret.id
   secret_string = jsonencode({

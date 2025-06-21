@@ -1,3 +1,4 @@
+# Glue Catalog Database for Iceberg tables
 resource "aws_glue_catalog_database" "glue_db" {
   name = "${var.raw_data_directory}_${var.stage}"
 
@@ -6,6 +7,7 @@ resource "aws_glue_catalog_database" "glue_db" {
   }
 }
 
+# Glue Connection to Aurora PostgreSQL (used for ETL extraction)
 resource "aws_glue_connection" "glue_rds_connection" {
   name = "${replace(var.raw_data_directory, "_", "-")}-postgres-connection-${var.stage}"
 
@@ -22,6 +24,7 @@ resource "aws_glue_connection" "glue_rds_connection" {
   }
 }
 
+# Glue ETL Job to extract data from Aurora and write to S3 in Iceberg format
 resource "aws_glue_job" "glue_etl_job" {
   name     = "${replace(var.raw_data_directory, "_", "-")}-aurora-to-s3-etl-${var.stage}"
   role_arn = aws_iam_role.glue_role.arn
@@ -56,7 +59,7 @@ resource "aws_glue_job" "glue_etl_job" {
   number_of_workers = 2
 }
 
-# s3 object with the glue python script
+# Upload the Glue ETL Python script to S3
 resource "aws_s3_object" "glue_etl_script" {
   bucket = var.bucket.bucket
   key    = "scripts/${var.raw_data_directory}_etl.py"
@@ -64,6 +67,7 @@ resource "aws_s3_object" "glue_etl_script" {
   etag   = filemd5("${path.module}/src/glue_etl.py")
 }
 
+# Archive all Python modules (except the main ETL script) for Glue job dependencies
 data "archive_file" "python_modules" {
   type        = "zip"
   output_path = "${path.module}/build/python_modules.zip"
@@ -71,6 +75,7 @@ data "archive_file" "python_modules" {
   excludes    = ["*.pyc", "*.pyo", "__pycache__", "glue_etl.py"]
 }
 
+# Upload the zipped Python modules to S3 for Glue job dependencies
 resource "aws_s3_object" "python_modules" {
   bucket = var.bucket.bucket
   key    = "scripts/python_modules.zip"

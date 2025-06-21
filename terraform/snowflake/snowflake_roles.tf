@@ -1,8 +1,10 @@
+# Main role for Northwind database access
 resource "snowflake_account_role" "northwind_role" {
   name    = "NORTHWIND_ROLE_${upper(var.stage)}"
   comment = "A role to use for the Northwind database"
 }
 
+# Roles for different sensitivity levels (used for masking policies)
 resource "snowflake_account_role" "low_sensitivity_role" {
   name    = "LOW_SENSITIVITY_ROLE_${upper(var.stage)}"
   comment = "A role to use for low sensitivity data"
@@ -18,12 +20,13 @@ resource "snowflake_account_role" "critical_sensitivity_role" {
   comment = "A role to use for critical sensitivity data"
 }
 
+# Grant the Northwind role to a parent role (e.g., for automation or admin)
 resource "snowflake_grant_account_role" "grant_northwind_role" {
   role_name        = snowflake_account_role.northwind_role.name
   parent_role_name = "TERRAGRUNT_ROLE"
 }
 
-# Grant warehouse usage to the role
+# Grant warehouse usage privileges to the Northwind role
 resource "snowflake_grant_privileges_to_account_role" "grant_wh_access" {
   privileges        = ["USAGE", "OPERATE", "MONITOR"]
   account_role_name = snowflake_account_role.northwind_role.name
@@ -33,7 +36,7 @@ resource "snowflake_grant_privileges_to_account_role" "grant_wh_access" {
   }
 }
 
-# Grant database usage to the role
+# Grant database usage privileges to the Northwind role
 resource "snowflake_grant_privileges_to_account_role" "grant_db_access" {
   privileges        = ["USAGE", "MONITOR"]
   account_role_name = snowflake_account_role.northwind_role.name
@@ -43,6 +46,7 @@ resource "snowflake_grant_privileges_to_account_role" "grant_db_access" {
   }
 }
 
+# Grant schema usage privileges to the Northwind role for a specific schema
 resource "snowflake_grant_privileges_to_account_role" "grant_schema_usage" {
   privileges        = ["USAGE"]
   account_role_name = snowflake_account_role.northwind_role.name
@@ -51,7 +55,7 @@ resource "snowflake_grant_privileges_to_account_role" "grant_schema_usage" {
   }
 }
 
-# Grant schema usage to the role
+# Grant schema privileges (modify, create table, usage) for all schemas in the database
 resource "snowflake_grant_privileges_to_account_role" "grant_schema_access" {
   privileges        = ["MODIFY", "CREATE TABLE", "USAGE"]
   account_role_name = snowflake_account_role.northwind_role.name
@@ -60,7 +64,7 @@ resource "snowflake_grant_privileges_to_account_role" "grant_schema_access" {
   }
 }
 
-# Grant table usage to the role
+# Grant table privileges (select, insert, update) for all tables in the schema
 resource "snowflake_grant_privileges_to_account_role" "grant_table_access" {
   privileges        = ["SELECT", "INSERT", "UPDATE"]
   account_role_name = snowflake_account_role.northwind_role.name
@@ -72,7 +76,7 @@ resource "snowflake_grant_privileges_to_account_role" "grant_table_access" {
   }
 }
 
-# Grant future table usage to the role
+# Grant future table privileges (select, insert, update) for all future tables in the schema
 resource "snowflake_grant_privileges_to_account_role" "grant_future_table_access" {
   privileges        = ["SELECT", "INSERT", "UPDATE"]
   account_role_name = snowflake_account_role.northwind_role.name

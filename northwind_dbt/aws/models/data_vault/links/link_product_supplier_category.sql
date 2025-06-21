@@ -1,11 +1,14 @@
+-- This link table connects products, suppliers, and categories in the Northwind database.
 {{ config(
     unique_key='link_product_supp_cat_key'
 ) }}
 
+-- The link table is built from the staging model 'stg_products',
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_products') }}
 ),
 
+-- The hub table for products is referenced to get their keys.
 hub_products AS (
     SELECT
         product_id,
@@ -13,6 +16,7 @@ hub_products AS (
     FROM {{ ref('hub_products') }}
 ),
 
+-- The hub table for suppliers is referenced to get their keys.
 hub_suppliers AS (
     SELECT
         supplier_id,
@@ -20,6 +24,7 @@ hub_suppliers AS (
     FROM {{ ref('hub_suppliers') }}
 ),
 
+-- The hub table for categories is referenced to get their keys.
 hub_categories AS (
     SELECT
         category_id,
@@ -27,6 +32,9 @@ hub_categories AS (
     FROM {{ ref('hub_categories') }}
 )
 
+-- The link table is constructed by joining the source data with the hub tables.
+-- It generates a surrogate key for the link and includes load timestamp and record source.
+-- Joins are made on product_id, supplier_id, and category_id to get the corresponding keys.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['hp.hub_product_key', 'hs.hub_supplier_key', 'hc.hub_category_key']) }} AS link_product_supp_cat_key,
     hp.hub_product_key,

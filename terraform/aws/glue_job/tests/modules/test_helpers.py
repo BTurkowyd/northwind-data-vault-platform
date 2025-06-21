@@ -18,6 +18,7 @@ from modules.helpers import (
 )
 
 
+# Fixture for job arguments
 @pytest.fixture
 def args():
     return {
@@ -26,6 +27,7 @@ def args():
     }
 
 
+# Fixture for Spark session
 @pytest.fixture
 def spark(args):
     spark = create_spark_session(args)
@@ -182,6 +184,7 @@ def dummy_args():
 @patch("logging.basicConfig")
 @patch("logging.debug")
 def test_configure_logging_debug_true(mock_debug, mock_basic_config):
+    """Test that configure_logging sets debug level and logs debug info when debug is True."""
     configure_logging(True, dummy_args())
     mock_basic_config.assert_called_once_with(
         level=logging.DEBUG,
@@ -193,6 +196,7 @@ def test_configure_logging_debug_true(mock_debug, mock_basic_config):
 
 @patch("logging.basicConfig")
 def test_configure_logging_debug_false(mock_basic_config):
+    """Test that configure_logging sets info level when debug is False."""
     configure_logging(False, dummy_args())
     mock_basic_config.assert_called_once_with(
         level=logging.INFO,

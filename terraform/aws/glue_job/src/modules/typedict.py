@@ -3,7 +3,8 @@ from typing import TypedDict
 
 class GlueJobArgs(TypedDict):
     """
-    TypedDict for Glue Job Arguments
+    TypedDict for Glue Job Arguments.
+    Defines the expected arguments passed to the Glue ETL job.
     """
 
     AURORA_CREDS_SECRET: str
@@ -15,7 +16,8 @@ class GlueJobArgs(TypedDict):
 
 class AuroraCredentials(TypedDict):
     """
-    TypedDict for Aurora Credentials
+    TypedDict for Aurora Credentials.
+    Defines the structure of credentials retrieved from AWS Secrets Manager.
     """
 
     username: str

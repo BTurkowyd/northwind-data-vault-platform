@@ -9,6 +9,7 @@ def get_jdbc_options(jdbc_url: str, secrets: AuroraCredentials) -> dict:
     Construct JDBC options for connecting to PostgreSQL.
     :param jdbc_url: The JDBC URL for the PostgreSQL database.
     :param secrets: The credentials retrieved from AWS Secrets Manager.
+    :return: Dictionary of JDBC options.
     """
     return {
         "url": jdbc_url,
@@ -23,6 +24,7 @@ def fetch_table_names(spark: SparkSession, jdbc_options: dict) -> list[str]:
     Fetch the names of all tables in the Aurora PostgreSQL database from the public schema.
     :param spark: The Spark session.
     :param jdbc_options: The JDBC options for connecting to PostgreSQL.
+    :return: List of table names.
     """
     query = """
         (SELECT table_name
@@ -46,6 +48,7 @@ def load_table_as_df(
     :param spark: The Spark session.
     :param table_name: The name of the table to load.
     :param jdbc_options: The JDBC options for connecting to PostgreSQL.
+    :return: Spark DataFrame containing the table data.
     """
     identifier_pattern = r"^[A-Za-z_][A-Za-z0-9_]*$"
 

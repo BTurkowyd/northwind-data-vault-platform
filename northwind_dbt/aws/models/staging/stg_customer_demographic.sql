@@ -1,3 +1,5 @@
+-- This staging model extracts all columns from the source 'customer_demographics' table and adds a record_source column.
+
 SELECT
     *,
     '{{ var("record_source") }}.customer_demographic' AS record_source

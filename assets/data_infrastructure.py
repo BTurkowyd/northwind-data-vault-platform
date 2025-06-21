@@ -2,8 +2,6 @@ from diagrams import Diagram, Cluster
 from diagrams.onprem.database import Postgresql
 from diagrams.aws.analytics import Glue
 from diagrams.aws.storage import S3
-from diagrams.programming.language import Python
-from diagrams.onprem.analytics import Spark
 from diagrams.generic.storage import Storage
 from diagrams.saas.analytics import Snowflake
 from diagrams.custom import Custom

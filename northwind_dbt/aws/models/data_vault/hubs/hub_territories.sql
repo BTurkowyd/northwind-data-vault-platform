@@ -1,8 +1,10 @@
+-- This model creates a hub for territories in the Northwind database.
 {{ config(
     unique_key='hub_territory_key',
     merge_update_columns=['territory_id', 'load_ts', 'record_source']
 ) }}
 
+-- Create a hub table for territories with a surrogate key for territory_id and load timestamp.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['territory_id']) }} AS hub_territory_key,
     territory_id,

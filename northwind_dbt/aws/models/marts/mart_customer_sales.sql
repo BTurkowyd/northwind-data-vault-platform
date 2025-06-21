@@ -1,3 +1,6 @@
+-- This mart aggregates sales revenue per customer, including company and country, in the Northwind database.
+
+-- Get the latest version of each order-product line from the satellite table.
 with latest_sat_order_products as (
     select
         link_order_product_key,
@@ -17,6 +20,7 @@ with latest_sat_order_products as (
     where row_num = 1
 ),
 
+-- Map orders to customers via the link table.
 order_customer as (
     select
         link_order_cust_emp_key,
@@ -25,6 +29,7 @@ order_customer as (
     from {{ ref('link_order_customer_employee') }}
 ),
 
+-- Get customer details from the satellite table.
 customer_details as (
     select
         hub_customer_key,
@@ -33,13 +38,14 @@ customer_details as (
     from {{ ref('sat_customers') }}
 ),
 
+-- Calculate revenue per order line and join with customer details.
 sales as (
     select
         l.link_order_product_key,
         oc.hub_customer_key,
         cd.company_name,
         cd.country,
-        cast(round(p.unit_price * p.quantity * (1 - p.discount), 2) as decimal(10,2))as revenue,
+        cast(round(p.unit_price * p.quantity * (1 - p.discount), 2) as decimal(10,2)) as revenue,
         p.load_ts
     from {{ ref('link_order_products') }} l
     join latest_sat_order_products p
@@ -50,4 +56,5 @@ sales as (
         on oc.hub_customer_key = cd.hub_customer_key
 )
 
+-- Final selection: one row per order-product line with customer and revenue info.
 select * from sales;

@@ -9,7 +9,7 @@ from .typedict import GlueJobArgs, AuroraCredentials
 
 def create_spark_session(args: GlueJobArgs) -> SparkSession:
     """
-    Create a Spark session with the specified configurations.
+    Create a Spark session with the specified configurations for Iceberg and Glue Catalog.
 
     Args:
         args (dict): A dictionary containing the necessary configurations for the Spark session.
@@ -23,7 +23,7 @@ def create_spark_session(args: GlueJobArgs) -> SparkSession:
     ):
         raise Exception("DESTINATION_BUCKET and DESTINATION_DIRECTORY must be provided")
 
-    # Create a Spark session with Glue Catalog
+    # Create a Spark session with Glue Catalog and Iceberg support
     spark = (
         SparkSession.builder.config(
             "spark.sql.catalog.glue_catalog", "org.apache.iceberg.spark.SparkCatalog"
@@ -68,7 +68,7 @@ def get_aurora_credentials(secret_name: str) -> AuroraCredentials:
 
 def get_job_arguments() -> GlueJobArgs:
     """
-    Retrieve job arguments passed to the Glue job.
+    Retrieve job arguments passed to the Glue job using AWS Glue's getResolvedOptions.
 
     Returns:
         dict: A dictionary containing the job arguments.

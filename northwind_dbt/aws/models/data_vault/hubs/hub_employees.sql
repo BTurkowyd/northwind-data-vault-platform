@@ -1,7 +1,9 @@
+-- This model creates a hub for employees in the Northwind database.
 {{ config(
     unique_key='hub_employee_key'
 ) }}
 
+-- Create a hub for employees with a surrogate key for employee_id and load timestamp.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['employee_id']) }} AS hub_employee_key,
     employee_id,

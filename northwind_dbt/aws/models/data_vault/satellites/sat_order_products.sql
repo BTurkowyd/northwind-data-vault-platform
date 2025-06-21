@@ -1,12 +1,15 @@
+-- This satellite table captures the attributes of order-product relationships in the Northwind database.
 {{ config(
     unique_key='sat_order_product_key',
     merge_update_columns=['unit_price', 'quantity', 'discount', 'hashdiff', 'load_ts', 'record_source']
 ) }}
 
+-- The satellite table is built from the staging model 'stg_order_details'.
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_order_details') }}
 ),
 
+-- The hub tables for orders and products, and the link table for order-products, are referenced to get the keys.
 hub_orders AS (
     SELECT
         order_id,
@@ -29,6 +32,7 @@ link_order_products AS (
     FROM {{ ref('link_order_products') }}
 ),
 
+-- The satellite table is constructed by joining the source data with the hub and link keys.
 prepared AS (
     SELECT
         sd.*,
@@ -43,6 +47,7 @@ prepared AS (
             AND hp.hub_product_key = lop.hub_product_key
 )
 
+-- Final selection of attributes for the satellite table.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['link_order_product_key', 'hashdiff']) }} AS sat_order_product_key,
     link_order_product_key,

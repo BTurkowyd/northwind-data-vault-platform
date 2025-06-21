@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from modules.iceberg import write_to_iceberg
 
 
+# Fixture for a mock Spark session
 @pytest.fixture
 def mock_spark():
     mock = MagicMock()
@@ -10,6 +11,7 @@ def mock_spark():
     return mock
 
 
+# Fixture for a mock DataFrame
 @pytest.fixture
 def mock_df():
     return MagicMock()
