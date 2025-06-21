@@ -1,3 +1,6 @@
+-- This mart provides detailed sales facts per order-product line, including revenue and shipment details.
+
+-- Get the latest version of each order-product line from the satellite table.
 with latest_sat_order_products as (
     select *
     from (
@@ -12,6 +15,7 @@ with latest_sat_order_products as (
     where row_num = 1
 ),
 
+-- Calculate revenue and collect order line details.
 order_lines as (
     select
         l.link_order_product_key,
@@ -29,6 +33,7 @@ order_lines as (
         on l.link_order_product_key = p.link_order_product_key
 ),
 
+-- Get order-level shipment and date details.
 orders as (
     select
         o.hub_order_key,
@@ -43,6 +48,7 @@ orders as (
     from {{ ref('sat_orders') }} o
 ),
 
+-- Join order lines with order details.
 final as (
 
     select
@@ -64,4 +70,5 @@ final as (
 
 )
 
+-- Final selection: one row per order-product line with sales and shipment info.
 select * from final

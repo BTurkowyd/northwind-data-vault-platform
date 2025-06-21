@@ -1,3 +1,6 @@
+-- This mart aggregates sales revenue, freight, and order count by region, city, and month in the Northwind database.
+
+-- Get the latest version of each order-product line from the satellite table.
 with latest_sat_order_products as (
     select
         link_order_product_key,
@@ -17,6 +20,7 @@ with latest_sat_order_products as (
     where row_num = 1
 ),
 
+-- Calculate revenue per order line.
 order_lines as (
 
     select
@@ -34,6 +38,7 @@ order_lines as (
 
 ),
 
+-- Get order-level region, city, and shipment details.
 orders as (
     select
         hub_order_key,
@@ -45,6 +50,7 @@ orders as (
     from {{ ref('sat_orders') }}
 ),
 
+-- Join order lines with order details.
 region_sales as (
     select
         ol.link_order_product_key,

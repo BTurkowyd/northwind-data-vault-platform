@@ -1,3 +1,6 @@
+-- This mart aggregates total sales revenue, order count, and quantity per product in the Northwind database.
+
+-- Get the latest version of each order-product line from the satellite table.
 with latest_sat_order_products as (
     select
         link_order_product_key,
@@ -17,6 +20,7 @@ with latest_sat_order_products as (
     where row_num = 1
 ),
 
+-- Calculate revenue per product line.
 product_lines as (
     select
         l.hub_product_key,
@@ -30,6 +34,7 @@ product_lines as (
         on l.link_order_product_key = p.link_order_product_key
 ),
 
+-- Aggregate revenue, order count, and quantity per product.
 aggregated as (
     select
         hub_product_key,
@@ -40,4 +45,5 @@ aggregated as (
     group by hub_product_key
 )
 
+-- Final selection: one row per product with total revenue, order count, and quantity.
 select * from aggregated;

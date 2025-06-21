@@ -1,3 +1,6 @@
+-- This mart aggregates sales revenue, freight, and order count by country and year in the Northwind database.
+
+-- Get the latest version of each order-product line from the satellite table.
 with latest_sat_order_products as (
     select
         link_order_product_key,
@@ -17,6 +20,7 @@ with latest_sat_order_products as (
     where row_num = 1
 ),
 
+-- Calculate revenue per order line.
 order_lines as (
     select
         l.link_order_product_key,
@@ -32,6 +36,7 @@ order_lines as (
         on l.link_order_product_key = p.link_order_product_key
 ),
 
+-- Get order-level country and date details.
 orders as (
     select
         hub_order_key,
@@ -41,6 +46,7 @@ orders as (
     from {{ ref('sat_orders') }}
 ),
 
+-- Join order lines with order details.
 country_year_sales as (
     select
         ol.link_order_product_key,
@@ -56,6 +62,7 @@ country_year_sales as (
         on ol.hub_order_key = o.hub_order_key
 )
 
+-- Final selection: aggregates by country and year.
 select
     ship_country,
     date_trunc('year', order_date) as year,
