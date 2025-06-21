@@ -1,7 +1,10 @@
+-- This model creates a hub for customers in the Northwind database.
 {{ config(
     unique_key='hub_customer_key'
 ) }}
 
+
+-- Create a hub for customers with a surrogate key for customer_id and load timestamp.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['customer_id']) }} AS hub_customer_key,
     customer_id,
