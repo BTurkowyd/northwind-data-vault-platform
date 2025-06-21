@@ -1,11 +1,14 @@
+-- This link table connects employees to their territories in the Northwind database.
 {{ config(
     unique_key='link_employee_territory_key'
 ) }}
 
+-- The link table is built from the staging model 'stg_employee_territories',
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_employee_territories') }}
 ),
 
+-- The hub table for employees is referenced to get their keys.
 hub_employees AS (
     SELECT
         employee_id,
@@ -13,6 +16,7 @@ hub_employees AS (
     FROM {{ ref('hub_employees') }}
 ),
 
+-- The hub table for territories is referenced to get their keys.
 hub_territories AS (
     SELECT
         territory_id,
@@ -20,6 +24,9 @@ hub_territories AS (
     FROM {{ ref('hub_territories') }}
 )
 
+-- The link table is constructed by joining the source data with the hub tables.
+-- It generates a surrogate key for the link and includes load timestamp and record source.
+-- Joins are made on employee_id and territory_id to get the corresponding keys.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['he.hub_employee_key', 'ht.hub_territory_key']) }} AS link_employee_territory_key,
     he.hub_employee_key,

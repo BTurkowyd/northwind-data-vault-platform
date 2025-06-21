@@ -1,11 +1,14 @@
+-- This model creates a link table that connects orders, customers, and employees.
 {{ config(
     unique_key='link_order_cust_emp_key'
 ) }}
 
+-- The link table is built from the staging model 'stg_orders',
 WITH source_data AS (
     SELECT * FROM {{ ref('stg_orders') }}
 ),
 
+-- The hub table for orders is referenced to get their keys.
 hub_orders AS (
     SELECT
         order_id,
@@ -13,6 +16,7 @@ hub_orders AS (
     FROM {{ ref('hub_orders') }}
 ),
 
+-- The hub table for customers is referenced to get their keys.
 hub_customers AS (
     SELECT
         customer_id,
@@ -20,6 +24,7 @@ hub_customers AS (
     FROM {{ ref('hub_customers') }}
 ),
 
+-- The hub tables for employees is referenced to get their keys.
 hub_employees AS (
     SELECT
         employee_id,
@@ -27,6 +32,9 @@ hub_employees AS (
     FROM {{ ref('hub_employees') }}
 )
 
+-- The link table is constructed by joining the source data with the hub tables.
+-- It generates a surrogate key for the link and includes load timestamp and record source.
+-- Joins are made on order_id, customer_id, and employee_id to get the corresponding keys.
 SELECT
     {{ dbt_utils.generate_surrogate_key(['ho.hub_order_key', 'hc.hub_customer_key', 'he.hub_employee_key']) }} AS link_order_cust_emp_key,
     ho.hub_order_key,
